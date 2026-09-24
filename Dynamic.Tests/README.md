@@ -33,13 +33,3 @@ The suite has two important types of assertions:
 That second category is especially important: the rewriter decides what an
 identifier means, while Roslyn remains responsible for language rules such as
 definite assignment.
-
-## Suggested first run
-
-Copy the `.cs` files into the test project and run:
-
-    dotnet test
-
-If one of the source snippets uses a framework type that your runtime compiler
-does not yet include in its metadata references, keep the failing test: it may
-be exposing a real reference-discovery gap rather than a test problem.
