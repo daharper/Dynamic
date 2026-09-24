@@ -1,5 +1,11 @@
 ﻿namespace Dynamic.Runtime;
 
+/// <summary>
+/// Provides a registry for the active classes associated with a given object type.
+/// </summary>
+/// <typeparam name="TSelf">
+/// The active object type whose classes are registered.
+/// </typeparam>
 public static class ActiveClassRegistry<TSelf>
 {
     private static ActiveClass<TSelf> _current
