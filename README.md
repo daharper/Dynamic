@@ -4,12 +4,6 @@ An experimental C# runtime exploring how far a statically typed language can be 
 
 Dynamic grew out of a broader experiment in modelling objects whose state and capabilities can evolve during their lifetime, particularly in the context of decision-making systems informed by traditional logic, philosophical psychology and metaphysics.
 
-The original question was simple:
-
-> **How dynamic can C# actually be?**
-
-The answer turns out to be: quite dynamic.
-
 ## What does it do?
 
 Dynamic explores runtime capabilities including:
