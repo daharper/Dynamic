@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DynamicRuntime\Dynamic.Runtime.csproj" />
+    <ProjectReference Include="..\Dynamic.Runtime\Dynamic.Runtime.csproj" />
   </ItemGroup>
 
   <ItemGroup>
