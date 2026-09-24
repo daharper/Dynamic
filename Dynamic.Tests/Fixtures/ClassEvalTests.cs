@@ -88,9 +88,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
     {
         dynamic bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
@@ -109,9 +107,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
     {
         dynamic bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 

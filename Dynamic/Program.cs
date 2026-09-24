@@ -1,6 +1,24 @@
 ﻿using Dynamic;
 
-dynamic bob = new Person();
+dynamic bob = new Person { FirstName = "Bob" };
+dynamic alice = new Person { FirstName = "Alice" };
 
+bob.Eval("""
+              public string DisplayName()
+              {
+                  return FirstName;
+              }
+
+              public string Greeting()
+              {
+                  return "Hello " + DisplayName();
+              }
+              """);
+
+
+Console.WriteLine(bob.Greeting());
+// Console.WriteLine(alice.Greeting()); error: 'Person' does not contain a definition for 'Greeting'
+
+// distinguish between long and int overloads
 Console.WriteLine(bob.Send("Double", 42L));
 Console.WriteLine(bob.Send("Double", 42));
