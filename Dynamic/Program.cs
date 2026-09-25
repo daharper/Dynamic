@@ -1,9 +1,10 @@
 ﻿using Dynamic;
+using Dynamic.Runtime;
 
 dynamic bob = new Person { FirstName = "Bob" };
 dynamic alice = new Person { FirstName = "Alice" };
 
-bob.Eval("""
+bob.ClassEval("""
               public string DisplayName()
               {
                   return FirstName;
@@ -15,9 +16,20 @@ bob.Eval("""
               }
               """);
 
+Console.WriteLine(bob.Greeting());          // Hello Bob
+Console.WriteLine(alice.Greeting());        // Hello Alice
 
-Console.WriteLine(bob.Greeting());
+alice.Eval("""
+           public string Greeting()
+           {
+               return "Bonjour " + DisplayName();
+           }
+           """);
 
-// distinguish between long and int overloads
-Console.WriteLine(bob.Send("Double", 42L));
-Console.WriteLine(bob.Send("Double", 42));
+Console.WriteLine(bob.Greeting());           // Hello Bob
+Console.WriteLine(alice.Greeting());         // Bonjour Alice
+
+Console.WriteLine(bob.Send("Double", 42L));  // calls the long overload
+Console.WriteLine(bob.Send("Double", 42));   // calls the int overload
+
+Console.WriteLine(Eval.Run<int>("18 + 24")); // 42
