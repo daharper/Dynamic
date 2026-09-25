@@ -20,6 +20,11 @@ public sealed class Person : ActiveObject<Person>
     {
         return value;
     }
+
+    public int Sum(params int[] values)
+    {
+        return values.Sum();
+    }
 }
 
 public record class Cat(string Name);
