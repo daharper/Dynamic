@@ -33,9 +33,7 @@ public static class RuntimeCompiler
             .ToHashSet(StringComparer.Ordinal);
 
         var assemblyId = Interlocked.Increment(ref _assemblyId);
-
         var assemblyName = $"DynamicRuntime_Class_{typeof(TSelf).Name}_{assemblyId}";
-
         var generatedTypeName = $"__ClassPatch_{assemblyId}";
 
         var generatedSource = GenerateSource<TSelf>(
@@ -72,20 +70,16 @@ public static class RuntimeCompiler
         pe.Position = 0;
 
         var assembly = AssemblyLoadContext.Default.LoadFromStream(pe);
-
         var generatedType = assembly.GetType($"DynamicRuntime.Generated.{generatedTypeName}", throwOnError: true)!;
-
         var builder = current.ToBuilder();
 
         InstallMethods(generatedType, members.Methods, builder);
-
         InstallProperties(generatedType, members.Properties, builder);
 
         return builder.Build();
     }
 
-    public static ActiveObjectClass<TSelf> CompileInstance<TSelf>(TSelf self, ActiveObjectClass<TSelf> current,
-        string source)
+    public static ActiveObjectClass<TSelf> CompileInstance<TSelf>(TSelf self, ActiveObjectClass<TSelf> current, string source)
         where TSelf : ActiveObject<TSelf>
     {
         var members = ParseMembers(source);
@@ -108,9 +102,7 @@ public static class RuntimeCompiler
             .ToHashSet(StringComparer.Ordinal);
 
         var assemblyId = Interlocked.Increment(ref _assemblyId);
-
         var assemblyName = $"DynamicRuntime_Instance_{typeof(TSelf).Name}_{assemblyId}";
-
         var generatedTypeName = $"__InstancePatch_{assemblyId}";
 
         var generatedSource = GenerateSource<TSelf>(
@@ -146,54 +138,22 @@ public static class RuntimeCompiler
         pe.Position = 0;
 
         var assembly = AssemblyLoadContext.Default.LoadFromStream(pe);
-
         var generatedType = assembly.GetType($"DynamicRuntime.Generated.{generatedTypeName}", throwOnError: true)!;
-
         var builder = current.ToBuilder();
 
         InstallMethods(generatedType, members.Methods, builder);
-
         InstallProperties(generatedType, members.Properties, builder);
 
         return builder.Build();
     }
 
-    private static void InstallMethods<TSelf>(
-        Type generatedType,
-        IReadOnlyList<MethodDeclarationSyntax> methods,
-        ActiveClassBuilder<TSelf> builder)
+    private static void InstallMethods<TSelf>(Type generatedType, IReadOnlyList<MethodDeclarationSyntax> methods, ActiveClassBuilder<TSelf> builder)
     {
         foreach (var method in methods)
         {
             var invokeName = $"__Invoke_{method.Identifier.ValueText}";
 
-            var invoker = generatedType.GetMethod(
-                              invokeName,
-                              BindingFlags.Public |
-                              BindingFlags.Static)
-                          ?? throw new InvalidOperationException(
-                              $"Generated method '{invokeName}' was not found.");
-
-            var implementation = (DynamicMethod<TSelf>)
-                invoker.CreateDelegate(typeof(DynamicMethod<TSelf>));
-
-            builder.Method(method.Identifier.ValueText, implementation);
-        }
-    }
-
-    private static void InstallMethods<TSelf>(
-        Type generatedType,
-        IReadOnlyList<MethodDeclarationSyntax> methods,
-        ActiveObjectClassBuilder<TSelf> builder)
-    {
-        foreach (var method in methods)
-        {
-            var invokeName = $"__Invoke_{method.Identifier.ValueText}";
-
-            var invoker = generatedType.GetMethod(
-                              invokeName,
-                              BindingFlags.Public |
-                              BindingFlags.Static)
+            var invoker = generatedType.GetMethod(invokeName, BindingFlags.Public | BindingFlags.Static) 
                           ?? throw new InvalidOperationException($"Generated method '{invokeName}' was not found.");
 
             var implementation = (DynamicMethod<TSelf>)invoker.CreateDelegate(typeof(DynamicMethod<TSelf>));
@@ -202,16 +162,27 @@ public static class RuntimeCompiler
         }
     }
 
-    private static void InstallProperties<TSelf>(
-        Type generatedType,
-        IReadOnlyList<PropertyDeclarationSyntax> properties,
-        ActiveClassBuilder<TSelf> builder)
+    private static void InstallMethods<TSelf>(Type generatedType, IReadOnlyList<MethodDeclarationSyntax> methods, ActiveObjectClassBuilder<TSelf> builder)
+    {
+        foreach (var method in methods)
+        {
+            var invokeName = $"__Invoke_{method.Identifier.ValueText}";
+
+            var invoker = generatedType.GetMethod(invokeName, BindingFlags.Public | BindingFlags.Static)
+                          ?? throw new InvalidOperationException($"Generated method '{invokeName}' was not found.");
+
+            var implementation = (DynamicMethod<TSelf>)invoker.CreateDelegate(typeof(DynamicMethod<TSelf>));
+
+            builder.Method(method.Identifier.ValueText, implementation);
+        }
+    }
+
+    private static void InstallProperties<TSelf>(Type generatedType, IReadOnlyList<PropertyDeclarationSyntax> properties, ActiveClassBuilder<TSelf> builder)
         where TSelf : ActiveObject<TSelf>
     {
         for (var i = 0; i < properties.Count; i++)
         {
             var property = properties[i];
-
             var name = property.Identifier.ValueText;
 
             if (IsAutoProperty(property))
@@ -233,12 +204,8 @@ public static class RuntimeCompiler
 
             var getterName = $"__GetProperty_{i}_{name}";
 
-            var getterMethod = generatedType.GetMethod(
-                                   getterName,
-                                   BindingFlags.Public |
-                                   BindingFlags.Static)
-                               ?? throw new InvalidOperationException(
-                                   $"Generated getter '{getterName}' was not found.");
+            var getterMethod = generatedType.GetMethod(getterName, BindingFlags.Public | BindingFlags.Static)
+                               ?? throw new InvalidOperationException($"Generated getter '{getterName}' was not found.");
 
             var computedGetter = (Func<TSelf, object?>)getterMethod.CreateDelegate(typeof(Func<TSelf, object?>));
 
@@ -246,16 +213,12 @@ public static class RuntimeCompiler
         }
     }
 
-    private static void InstallProperties<TSelf>(
-        Type generatedType,
-        IReadOnlyList<PropertyDeclarationSyntax> properties,
-        ActiveObjectClassBuilder<TSelf> builder)
+    private static void InstallProperties<TSelf>(Type generatedType, IReadOnlyList<PropertyDeclarationSyntax> properties, ActiveObjectClassBuilder<TSelf> builder)
         where TSelf : ActiveObject<TSelf>
     {
         for (var i = 0; i < properties.Count; i++)
         {
             var property = properties[i];
-
             var name = property.Identifier.ValueText;
 
             if (IsAutoProperty(property))
@@ -277,12 +240,8 @@ public static class RuntimeCompiler
 
             var getterName = $"__GetProperty_{i}_{name}";
 
-            var getterMethod = generatedType.GetMethod(
-                                   getterName,
-                                   BindingFlags.Public |
-                                   BindingFlags.Static)
-                               ?? throw new InvalidOperationException(
-                                   $"Generated getter '{getterName}' was not found.");
+            var getterMethod = generatedType.GetMethod(getterName, BindingFlags.Public | BindingFlags.Static)
+                               ?? throw new InvalidOperationException($"Generated getter '{getterName}' was not found.");
 
             var computedGetter = (Func<TSelf, object?>)getterMethod.CreateDelegate(typeof(Func<TSelf, object?>));
 
@@ -317,7 +276,6 @@ public static class RuntimeCompiler
             .Single(static declaration => declaration.Identifier.ValueText == "__Input");
 
         var methods = new List<MethodDeclarationSyntax>();
-
         var properties = new List<PropertyDeclarationSyntax>();
 
         foreach (var member in type.Members)
@@ -333,8 +291,7 @@ public static class RuntimeCompiler
                     break;
 
                 default:
-                    throw new NotSupportedException(
-                        $"RuntimeCompiler does not yet support member type '{member.Kind()}'.");
+                    throw new NotSupportedException($"RuntimeCompiler does not yet support member type '{member.Kind()}'.");
             }
         }
 
@@ -350,18 +307,11 @@ public static class RuntimeCompiler
         where TSelf : ActiveObject<TSelf>
     {
         var selfType = GetCSharpTypeName(typeof(TSelf));
-
         var generatedMembers = new StringBuilder();
 
         for (var i = 0; i < methods.Count; i++)
         {
-            generatedMembers.AppendLine(
-                GenerateMethod<TSelf>(
-                    methods[i],
-                    i,
-                    selfType,
-                    runtimePropertyNames,
-                    runtimeMethodNames));
+            generatedMembers.AppendLine(GenerateMethod<TSelf>(methods[i], i, selfType, runtimePropertyNames, runtimeMethodNames));
         }
 
         for (var i = 0; i < properties.Count; i++)
@@ -370,13 +320,7 @@ public static class RuntimeCompiler
 
             if (IsAutoProperty(property)) continue;
 
-            generatedMembers.AppendLine(
-                GenerateProperty<TSelf>(
-                    property,
-                    i,
-                    selfType,
-                    runtimePropertyNames,
-                    runtimeMethodNames));
+            generatedMembers.AppendLine(GenerateProperty<TSelf>(property, i, selfType, runtimePropertyNames, runtimeMethodNames));
         }
 
         return $$"""
@@ -412,14 +356,12 @@ public static class RuntimeCompiler
         ValidateMethod(method);
 
         var name = method.Identifier.ValueText;
-
         var implementationName = $"__Implementation_{index}_{name}";
-
         var invokeName = $"__Invoke_{name}";
 
         var returnType = method.ReturnType.ToFullString().Trim();
 
-        var unsafeModifier =
+        var unsafeModifier = 
             method.Modifiers.Any(static modifier => modifier.IsKind(SyntaxKind.UnsafeKeyword))
                 ? "unsafe "
                 : string.Empty;
@@ -440,15 +382,13 @@ public static class RuntimeCompiler
         {
             var parameter = parameters[i];
 
-            var parameterType =
-                parameter.Type?.ToFullString().Trim()
-                ?? throw new NotSupportedException($"Parameter '{parameter.Identifier}' must have an explicit type.");
+            var parameterType = parameter.Type?.ToFullString().Trim()
+                                ?? throw new NotSupportedException($"Parameter '{parameter.Identifier}' must have an explicit type.");
 
             invocationArguments.Add($"({parameterType})args[{i}]!");
         }
 
         var rewriter = new SelfMemberRewriter(typeof(TSelf), runtimePropertyNames, runtimeMethodNames);
-
         var rewritten = (MethodDeclarationSyntax)rewriter.Visit(method)!;
 
         var implementationBody = rewritten.Body is not null
@@ -504,15 +444,11 @@ public static class RuntimeCompiler
         IReadOnlySet<string> runtimePropertyNames,
         IReadOnlySet<string> runtimeMethodNames)
     {
-        var name =
-            property.Identifier.ValueText;
+        var name = property.Identifier.ValueText;
 
-        var getter =
-            property.AccessorList?
+        var getter = property.AccessorList?
                 .Accessors
-                .FirstOrDefault(static accessor =>
-                    accessor.IsKind(
-                        SyntaxKind.GetAccessorDeclaration));
+                .FirstOrDefault(static accessor => accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
 
         if (getter is null)
         {
@@ -520,7 +456,6 @@ public static class RuntimeCompiler
         }
 
         var rewriter = new SelfMemberRewriter(typeof(TSelf), runtimePropertyNames, runtimeMethodNames);
-
         var rewrittenGetter = (AccessorDeclarationSyntax)rewriter.Visit(getter)!;
 
         string getterBody;
@@ -549,24 +484,18 @@ public static class RuntimeCompiler
 
     private static bool IsAutoProperty(PropertyDeclarationSyntax property)
     {
-        if (property.AccessorList is null)
-            return false;
+        if (property.AccessorList is null) return false;
 
         return property.AccessorList
             .Accessors
-            .All(static accessor =>
-                accessor.Body is null &&
-                accessor.ExpressionBody is null);
+            .All(static accessor => accessor.Body is null && accessor.ExpressionBody is null);
     }
 
     private static bool HasSetter(PropertyDeclarationSyntax property)
     {
         return property.AccessorList?
                    .Accessors
-                   .Any(static accessor =>
-                       accessor.IsKind(
-                           SyntaxKind.SetAccessorDeclaration))
-               == true;
+                   .Any(static accessor => accessor.IsKind(SyntaxKind.SetAccessorDeclaration)) == true;
     }
 
     private static void ValidateMethod(MethodDeclarationSyntax method)
@@ -577,8 +506,7 @@ public static class RuntimeCompiler
                 $"Generic runtime method '{method.Identifier.ValueText}' is not supported yet.");
         }
 
-        foreach (var parameter
-                 in method.ParameterList.Parameters)
+        foreach (var parameter in method.ParameterList.Parameters)
         {
             if (parameter.Modifiers.Any(static modifier =>
                     modifier.Kind() is
@@ -586,27 +514,19 @@ public static class RuntimeCompiler
                         SyntaxKind.OutKeyword or
                         SyntaxKind.InKeyword))
             {
-                throw new NotSupportedException(
-                    $"ref/out/in parameters are not supported yet: '{parameter.Identifier}'.");
+                throw new NotSupportedException($"ref/out/in parameters are not supported yet: '{parameter.Identifier}'.");
             }
         }
 
-        if (method.Body is null &&
-            method.ExpressionBody is null)
+        if (method.Body is null && method.ExpressionBody is null)
         {
-            throw new NotSupportedException(
-                $"Method '{method.Identifier.ValueText}' must have a body.");
+            throw new NotSupportedException($"Method '{method.Identifier.ValueText}' must have a body.");
         }
     }
 
     private static bool IsVoid(MethodDeclarationSyntax method)
-    {
-        return method.ReturnType
-                   is PredefinedTypeSyntax predefined &&
-               predefined.Keyword.IsKind(
-                   SyntaxKind.VoidKeyword);
-    }
-
+        => method.ReturnType is PredefinedTypeSyntax predefined && predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+    
     private static IReadOnlyList<MetadataReference> GetMetadataReferences<TSelf>()
     {
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -624,11 +544,8 @@ public static class RuntimeCompiler
         }
 
         AddAssembly(paths, typeof(object).Assembly);
-
         AddAssembly(paths, typeof(TSelf).Assembly);
-
         AddAssembly(paths, typeof(ActiveObject<>).Assembly);
-
         AddAssembly(paths, typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly);
 
         return paths.Select(static path => MetadataReference.CreateFromFile(path)).ToArray();
@@ -658,13 +575,10 @@ public static class RuntimeCompiler
         return "global::" + name.Replace('+', '.');
     }
 
-    private static RuntimeCompilationException
-        CreateCompilationException(string source, string generatedSource, IEnumerable<Diagnostic> diagnostics)
+    private static RuntimeCompilationException CreateCompilationException(string source, string generatedSource, IEnumerable<Diagnostic> diagnostics)
     {
         var errors = diagnostics
-            .Where(static diagnostic =>
-                diagnostic.Severity ==
-                DiagnosticSeverity.Error)
+            .Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
             .ToArray();
 
         return new RuntimeCompilationException(source, generatedSource, errors);
@@ -673,21 +587,16 @@ public static class RuntimeCompiler
     private static string Indent(string text, int level)
     {
         var indentation = new string(' ', level * 4);
-
         var lines = text.Replace("\r\n", "\n").Split('\n');
 
-        return string.Join(Environment.NewLine,
-            lines.Select(line => line.Length == 0 ? string.Empty : indentation + line));
+        return string.Join(Environment.NewLine, lines.Select(line => line.Length == 0 ? string.Empty : indentation + line));
     }
 
     public static object? Evaluate(string source)
     {
         var assemblyName = $"DynamicRuntime.Eval.{Guid.NewGuid():N}";
-
         var expression = SyntaxFactory.ParseExpression(source);
-
         var isExpression = !expression.ContainsDiagnostics;
-
         var body = isExpression ? $"return {source};" : source;
 
         var generatedSource =
@@ -738,11 +647,8 @@ public static class RuntimeCompiler
         pe.Position = 0;
 
         var assembly = AssemblyLoadContext.Default.LoadFromStream(pe);
-
         var type = assembly.GetType("__DynamicEval", throwOnError: true)!;
-
         var method = type.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Static)!;
-
         var invoke = method.CreateDelegate<Func<object?>>();
 
         return invoke();

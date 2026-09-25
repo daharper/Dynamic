@@ -17,7 +17,6 @@ bob.Eval("""
 
 
 Console.WriteLine(bob.Greeting());
-// Console.WriteLine(alice.Greeting()); error: 'Person' does not contain a definition for 'Greeting'
 
 // distinguish between long and int overloads
 Console.WriteLine(bob.Send("Double", 42L));

@@ -14,19 +14,12 @@ internal static class RuntimeMethodBinder
                 .Where(static method => !method.ContainsGenericParameters)
                 .Select(method =>
                 {
-                    var matches =
-                        RuntimeArgumentConverter.TryPrepareArguments(
-                            method.GetParameters(),
-                            message.Arguments,
-                            out var argumentBinding);
+                    var matches = RuntimeArgumentConverter.TryPrepareArguments(method.GetParameters(), message.Arguments, out var argumentBinding);
 
                     return new
                     {
                         Matches = matches,
-                        Candidate =
-                            new ClrMethodCandidate(
-                                method,
-                                argumentBinding)
+                        Candidate = new ClrMethodCandidate(method, argumentBinding)
                     };
                 })
                 .Where(static item => item.Matches)
@@ -106,15 +99,12 @@ internal static class RuntimeMethodBinder
     private static bool IsMoreSpecific(MethodInfo candidate, MethodInfo other, object?[] arguments)
     {
         var candidateParameters = candidate.GetParameters();
-
         var otherParameters = other.GetParameters();
-
         var candidateIsBetter = false;
 
         for (var i = 0; i < arguments.Length; i++)
         {
             var candidateType = candidateParameters[i].ParameterType;
-
             var otherType = otherParameters[i].ParameterType;
 
             if (candidateType == otherType)

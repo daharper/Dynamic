@@ -37,7 +37,6 @@ internal static class RuntimeMessageParser
         ValidateName(name);
 
         var argumentsSource = source[(openParen + 1)..^1];
-
         var arguments = ParseArguments(argumentsSource, commaSeparated: true);
 
         return new RuntimeMessage(name, arguments);
@@ -79,9 +78,7 @@ internal static class RuntimeMessageParser
     private static List<string> Tokenize(string source, bool commaSeparated)
     {
         var tokens = new List<string>();
-
         var current = new StringBuilder();
-
         char? quote = null;
 
         for (var index = 0; index < source.Length; index++)
@@ -103,7 +100,6 @@ internal static class RuntimeMessageParser
             if (character is '"' or '\'')
             {
                 quote = character;
-
                 current.Append(character);
 
                 continue;
