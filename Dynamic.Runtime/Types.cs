@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Dynamic.Runtime;
 
@@ -32,3 +33,9 @@ internal readonly record struct RuntimeArgumentBinding(object?[] Arguments, int 
 internal readonly record struct ClrMethodCandidate(MethodInfo Method, RuntimeArgumentBinding Binding);
 
 internal readonly record struct RuntimeMethodBinding(MethodInfo Method, object?[] Arguments);
+
+public abstract record Specification;
+
+public sealed record Criterion(MemberInfo Member, ExpressionType Operation, object? Value) : Specification;
+
+public sealed record CompositeSpecification(Specification Left, ExpressionType Operation, Specification Right) : Specification;

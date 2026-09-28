@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using Dynamic.Runtime;
+using Dynamic.Tests.Mocks;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace Dynamic.Tests.Fixtures;
@@ -295,5 +297,31 @@ public sealed class EvalTests : RuntimeTestBase
         var exception = Assert.Throws<InvalidOperationException>(() => bob.Choose("A", 42));
 
         Assert.Contains("Conflicting inferences for generic parameter 'T'", exception.Message);
+    }
+
+    [Fact]
+    public void Eval_can_return_expression_tree()
+    {
+        ActiveRuntime.Register(typeof(Person));
+
+        dynamic bob = new Person
+        {
+            FirstName = "Bob"
+        };
+
+        bob.Eval("""
+                 public Expression<Func<Person, bool>> FirstNameIs(string name)
+                 {
+                     return person => person.FirstName == name;
+                 }
+                 """);
+
+        Expression<Func<Person, bool>> specification = bob.FirstNameIs("Bob");
+
+        Assert.Equal(ExpressionType.Equal, specification.Body.NodeType);
+
+        var predicate = specification.Compile();
+
+        Assert.True(predicate(bob));
     }
 }

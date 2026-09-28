@@ -81,4 +81,6 @@ public sealed class Person : ActiveObject<Person>
     {
         return $"Missing: {message.Name}";
     }
+
+    public int Years { get; set; }
 }

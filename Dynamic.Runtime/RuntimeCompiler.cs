@@ -323,6 +323,12 @@ public static class RuntimeCompiler
             generatedMembers.AppendLine(GenerateProperty<TSelf>(property, i, selfType, runtimePropertyNames, runtimeMethodNames));
         }
 
+        var registeredUsings = string.Join(
+            Environment.NewLine,
+            ActiveRuntime.Namespaces
+                .OrderBy(static value => value)
+                .Select(static value => $"using {value};"));
+
         return $$"""
                  #nullable enable
 
@@ -330,12 +336,14 @@ public static class RuntimeCompiler
                  using System.Collections.Generic;
                  using System.IO;
                  using System.Linq;
+                 using System.Linq.Expressions;
                  using System.Threading;
                  using System.Threading.Tasks;
                  using System.Reflection;
                  using System.Runtime.Loader;
                  using Microsoft.CodeAnalysis;
                  using Microsoft.CodeAnalysis.CSharp;
+                 {{registeredUsings}}
 
                  namespace DynamicRuntime.Generated;
 
