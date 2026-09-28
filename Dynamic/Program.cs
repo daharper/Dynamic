@@ -1,31 +1,21 @@
-﻿using System.Linq.Expressions;
-using Dynamic.Runtime;
+﻿using Dynamic.Runtime;
 using Dynamic.Career;
 
 ActiveRuntime.Register(typeof(Person));
 
-dynamic alice = new Person { FirstName = "Alice" };
-dynamic bob = new Person { FirstName = "Bob" };
+var david = new Person
+{
+    Name = "David Harper",
+    Location = "Spennymoor, County Durham",
+    Availability = Availability.Immediately,
+    WorkingArrangements = WorkingArrangement.Remote | WorkingArrangement.Hybrid,
+    MinimumSalary = new Money(50_000m, "GBP")
+};
 
-bob.Eval("""
-         public Expression<Func<Person, bool>> FirstNameIs(string name)
-         {
-             return person => person.FirstName == name;
-         }
-         
-         public Expression<Func<Person, bool>> MinimumExperience(int years)
-         {
-             return person => person.Years >= years;
-         }
-         """);
+david.RightToWork.Australia();
+david.RightToWork.UnitedKingdom();
+david.RightToWork.Ireland();
 
-Expression<Func<Person, bool>> firstNameIsBob = bob.FirstNameIs("Bob");
+david.Achievements.Mvp("Embarcadero");
 
-Expression<Func<Person, bool>> minimumExperience = bob.MinimumExperience(5);
-
-var firstNameSpecification = SpecificationExtractor.Extract(firstNameIsBob);
-
-var experienceSpecification = SpecificationExtractor.Extract(minimumExperience);
-
-Console.WriteLine(firstNameSpecification);
-Console.WriteLine(experienceSpecification);
+david.Show();

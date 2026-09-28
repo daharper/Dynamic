@@ -83,4 +83,8 @@ public sealed class Person : ActiveObject<Person>
     }
 
     public int Years { get; set; }
+
+    public dynamic Friends { get; } = new ActiveList<string>();
+
+    public dynamic Achievements { get; } = new ActiveList<Achievement>(n => new Achievement(n));
 }
