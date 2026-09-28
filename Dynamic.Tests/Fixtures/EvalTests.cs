@@ -20,11 +20,7 @@ public sealed class EvalTests : RuntimeTestBase
 
         Assert.Equal("Alice only", (string)alice.Secret());
 
-        Assert.Throws<RuntimeBinderException>(
-            () =>
-            {
-                _ = bob.Secret();
-            });
+        Assert.Throws<RuntimeBinderException>(() => { _ = bob.Secret(); });
     }
 
     [Fact]
@@ -42,13 +38,8 @@ public sealed class EvalTests : RuntimeTestBase
 
         // First prove that the class member exists
         // before we install an instance override.
-        Assert.Equal(
-            "class",
-            (string)alice.Label());
-
-        Assert.Equal(
-            "class",
-            (string)bob.Label());
+        Assert.Equal("class", (string)alice.Label());
+        Assert.Equal("class", (string)bob.Label());
 
         alice.Eval("""
                    public string Label()
@@ -58,53 +49,28 @@ public sealed class EvalTests : RuntimeTestBase
                    """);
 
         // Alice should now hit the instance overlay.
-        Assert.Equal(
-            "instance",
-            (string)alice.Label());
+        Assert.Equal("instance", (string)alice.Label());
 
         // Bob should still hit the shared class definition.
-        Assert.Equal(
-            "class",
-            (string)bob.Label());
+        Assert.Equal("class", (string)bob.Label());
     }
 
     [Fact]
     public void Eval_auto_property_state_is_object_specific()
     {
-        dynamic alice =
-            NewPerson("Alice");
+        dynamic alice = NewPerson("Alice");
+        dynamic bob = NewPerson("Bob");
 
-        dynamic bob =
-            NewPerson("Bob");
+        alice.Eval("public string PrivateNickname { get; set; }");
 
-        alice.Eval("""
-                   public string PrivateNickname { get; set; }
-                   """);
+        alice.PrivateNickname = "Al";
 
-        alice.PrivateNickname =
-            "Al";
-
-        Assert.Equal(
-            "Al",
-            (string)alice.PrivateNickname);
-
-        Assert.False(
-            bob.HasProperty(
-                "PrivateNickname"));
-
-        Assert.Null(
-            bob.PrivateNickname);
-
-        Assert.True(
-            bob.HasProperty(
-                "PrivateNickname"));
-
-        Assert.Null(
-            bob.PrivateNickname);
-
-        Assert.Equal(
-            "Al",
-            (string)alice.PrivateNickname);
+        Assert.Equal("Al", (string)alice.PrivateNickname);
+        Assert.False(bob.HasProperty("PrivateNickname"));
+        Assert.Null(bob.PrivateNickname);
+        Assert.True(bob.HasProperty("PrivateNickname"));
+        Assert.Null(bob.PrivateNickname);
+        Assert.Equal("Al", (string)alice.PrivateNickname);
     }
 
     [Fact]
@@ -115,47 +81,29 @@ public sealed class EvalTests : RuntimeTestBase
         bob.Freeze = FreezeMode.Partial;
 
         Assert.Throws<RuntimeBinderException>(() => { _ = bob.PrivateNickname; });
-
         Assert.False(bob.HasProperty("PrivateNickname"));
     }
 
     [Fact]
     public void Freeze_modes_control_runtime_property_mutation()
     {
-        dynamic alice =
-            NewPerson("Alice");
+        dynamic alice = NewPerson("Alice");
 
         alice.Nickname = "Al";
 
-        Assert.Equal(
-            "Al",
-            (string)alice.Nickname);
+        Assert.Equal("Al", (string)alice.Nickname);
 
-        alice.Freeze =
-            FreezeMode.Partial;
+        alice.Freeze = FreezeMode.Partial;
 
         alice.Nickname = "Ali";
 
-        Assert.Equal(
-            "Ali",
-            (string)alice.Nickname);
+        Assert.Equal("Ali", (string)alice.Nickname);
 
-        alice.Freeze =
-            FreezeMode.Fully;
+        alice.Freeze = FreezeMode.Fully;
 
-        Assert.Equal(
-            "Ali",
-            (string)alice.Nickname);
-
-        Assert.Throws<RuntimeBinderException>(
-            () =>
-            {
-                alice.Nickname = "Alice";
-            });
-
-        Assert.Equal(
-            "Ali",
-            (string)alice.Nickname);
+        Assert.Equal("Ali", (string)alice.Nickname);
+        Assert.Throws<RuntimeBinderException>(() => { alice.Nickname = "Alice"; });
+        Assert.Equal("Ali", (string)alice.Nickname);
     }
 
     [Fact]
@@ -215,11 +163,9 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Fully_frozen_object_rejects_eval()
     {
-        dynamic alice =
-            NewPerson("Alice");
+        dynamic alice = NewPerson("Alice");
 
-        alice.Freeze =
-            FreezeMode.Fully;
+        alice.Freeze = FreezeMode.Fully;
 
         Assert.Throws<InvalidOperationException>(
             () =>
@@ -236,45 +182,27 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Fully_frozen_object_cannot_write_active_class_property()
     {
-        dynamic alice =
-            NewPerson("Alice");
+        dynamic alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string Nickname { get; set; }
-                        """);
+        alice.ClassEval("public string Nickname { get; set; }");
 
         alice.Nickname = "Al";
 
-        Assert.Equal(
-            "Al",
-            (string)alice.Nickname);
+        Assert.Equal("Al", (string)alice.Nickname);
 
-        alice.Freeze =
-            FreezeMode.Fully;
-
-        Assert.Equal(
-            "Al",
-            (string)alice.Nickname);
-
-        Assert.Throws<RuntimeBinderException>(
-            () =>
-            {
-                alice.Nickname = "Alice";
-            });
-
-        Assert.Equal(
-            "Al",
-            (string)alice.Nickname);
+        alice.Freeze = FreezeMode.Fully;
+        
+        Assert.Equal("Al", (string)alice.Nickname);
+        Assert.Throws<RuntimeBinderException>(() => { alice.Nickname = "Alice"; });
+        Assert.Equal("Al", (string)alice.Nickname);
     }
 
     [Fact]
     public void Partially_frozen_object_allows_eval()
     {
-        dynamic alice =
-            NewPerson("Alice");
+        dynamic alice = NewPerson("Alice");
 
-        alice.Freeze =
-            FreezeMode.Partial;
+        alice.Freeze = FreezeMode.Partial;
 
         alice.Eval("""
                    public string Secret()
@@ -283,8 +211,89 @@ public sealed class EvalTests : RuntimeTestBase
                    }
                    """);
 
+        Assert.Equal("Secret", (string)alice.Secret());
+    }
+
+    [Fact]
+    public void Eval_can_define_and_invoke_generic_method()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        bob.Eval("""
+                 public T Echo<T>(T value)
+                 {
+                     return value;
+                 }
+                 """);
+
+        string result = bob.Echo("Hello");
+
+        Assert.Equal("Hello", result);
+    }
+
+    [Fact]
+    public void Eval_can_infer_generic_arguments_from_generic_interfaces()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        bob.Eval("""
+                 public IEnumerable<(T, V)> GetPairs<T, V>(
+                     IEnumerable<T> keys,
+                     IEnumerable<V> values)
+                 {
+                     return keys.Zip(values, (k, v) => (k, v));
+                 }
+                 """);
+
+        var keys = new[] { "A", "B", "C" };
+        var values = new[] { 1, 2, 3 };
+
+        IEnumerable<(string, int)> result =
+            bob.GetPairs(keys, values);
+
         Assert.Equal(
-            "Secret",
-            (string)alice.Secret());
+            new[]
+            {
+                ("A", 1),
+                ("B", 2),
+                ("C", 3)
+            },
+            result);
+    }
+
+    [Fact]
+    public void Eval_can_infer_generic_argument_from_constructed_generic_type()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        bob.Eval("""
+                 public T Create<T>(Func<T> factory)
+                 {
+                     return factory();
+                 }
+                 """);
+
+        Func<string> factory = () => "Hello";
+
+        string result = bob.Create(factory);
+
+        Assert.Equal("Hello", result);
+    }
+
+    [Fact]
+    public void Eval_rejects_conflicting_generic_argument_inferences()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        bob.Eval("""
+                 public T Choose<T>(T first, T second)
+                 {
+                     return first;
+                 }
+                 """);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => bob.Choose("A", 42));
+
+        Assert.Contains("Conflicting inferences for generic parameter 'T'", exception.Message);
     }
 }

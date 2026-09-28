@@ -361,10 +361,13 @@ public static class RuntimeCompiler
 
         var returnType = method.ReturnType.ToFullString().Trim();
 
-        var unsafeModifier = 
-            method.Modifiers.Any(static modifier => modifier.IsKind(SyntaxKind.UnsafeKeyword))
+        var unsafeModifier = method.Modifiers.Any(static modifier => modifier.IsKind(SyntaxKind.UnsafeKeyword))
                 ? "unsafe "
                 : string.Empty;
+
+        var typeParameters = method.TypeParameterList?.ToFullString().Trim() ?? string.Empty;
+
+        var isGeneric = method.TypeParameterList is not null;
 
         var parameters = method.ParameterList.Parameters;
 
@@ -385,7 +388,10 @@ public static class RuntimeCompiler
             var parameterType = parameter.Type?.ToFullString().Trim()
                                 ?? throw new NotSupportedException($"Parameter '{parameter.Identifier}' must have an explicit type.");
 
-            invocationArguments.Add($"({parameterType})args[{i}]!");
+            if (!isGeneric)
+            {
+                invocationArguments.Add($"({parameterType})args[{i}]!");
+            }
         }
 
         var rewriter = new SelfMemberRewriter(typeof(TSelf), runtimePropertyNames, runtimeMethodNames);
@@ -407,23 +413,47 @@ public static class RuntimeCompiler
                                            }
                                    """;
 
-        var wrapperBody =
-            IsVoid(method)
-                ? $$"""
-                            {{argumentValidation}}
+        string wrapperBody;
 
-                            {{implementationName}}({{invokeArguments}});
-                            return null;
-                    """
-                : $$"""
-                            {{argumentValidation}}
+        if (isGeneric)
+        {
+            wrapperBody = $$"""
+                              var declaringType =
+                                  MethodBase.GetCurrentMethod()!.DeclaringType!;
+                                  
+                              var implementation = declaringType.GetMethods(
+                                  BindingFlags.Public |
+                                  BindingFlags.NonPublic |
+                                  BindingFlags.Static)
+                              .Single(m => m.Name == "{{implementationName}}");
 
-                            return {{implementationName}}({{invokeArguments}});
-                    """;
+                              var types = Dynamic.Runtime.RuntimeGenericInference.Infer(implementation, args);
+
+                              var closedImplementation = implementation.MakeGenericMethod(types);
+
+                              return closedImplementation.Invoke(null, [self, .. args]);
+                              """;
+        }
+        else
+        {
+            wrapperBody =
+                IsVoid(method)
+                    ? $$"""
+                                {{argumentValidation}}
+
+                                {{implementationName}}({{invokeArguments}});
+                                return null;
+                        """
+                    : $$"""
+                                {{argumentValidation}}
+
+                                return {{implementationName}}({{invokeArguments}});
+                        """;
+        }
 
         return $$"""
 
-                     private static {{unsafeModifier}}{{returnType}} {{implementationName}}(
+                     private static {{unsafeModifier}}{{returnType}} {{implementationName}}{{typeParameters}}(
                          {{string.Join(", ", implementationParameters)}})
                      {{implementationBody}}
 
@@ -500,11 +530,11 @@ public static class RuntimeCompiler
 
     private static void ValidateMethod(MethodDeclarationSyntax method)
     {
-        if (method.TypeParameterList is not null)
-        {
-            throw new NotSupportedException(
-                $"Generic runtime method '{method.Identifier.ValueText}' is not supported yet.");
-        }
+        //if (method.TypeParameterList is not null)
+        //{
+        //    throw new NotSupportedException(
+        //        $"Generic runtime method '{method.Identifier.ValueText}' is not supported yet.");
+        //}
 
         foreach (var parameter in method.ParameterList.Parameters)
         {

@@ -25,6 +25,11 @@ public sealed class Person : ActiveObject<Person>
     {
         return values.Sum();
     }
+
+    public IEnumerable<T> EchoThis<T>(params T[] values)
+    {
+        return values;
+    }
 }
 
 public record class Cat(string Name);
