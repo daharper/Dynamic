@@ -11,10 +11,14 @@ namespace Dynamic.Runtime;
 /// </summary>
 public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 {
+    #region private region
+
     private readonly HashSet<string> _clrMembers;
     private readonly HashSet<string> _runtimeProperties;
     private readonly HashSet<string> _runtimeMethods;
     private readonly Stack<ScopeFrame> _shadowedScopes = new();
+
+    #endregion
 
     public SelfMemberRewriter(Type clrType, IEnumerable<string> runtimeProperties, IEnumerable<string> runtimeMethods)
     {
@@ -29,8 +33,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
     public override SyntaxNode? VisitMethodDeclaration(MethodDeclarationSyntax node) 
     {
-        var parameterNames = node.ParameterList
-                .Parameters
+        var parameterNames = node.ParameterList.Parameters
                 .Select(static parameter => parameter.Identifier.ValueText)
                 .Where(static name => !string.IsNullOrEmpty(name))
                 .ToHashSet(StringComparer.Ordinal);
@@ -68,8 +71,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
      
     public override SyntaxNode? VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
     {
-        var parameterNames = node.ParameterList
-                .Parameters
+        var parameterNames = node.ParameterList.Parameters
                 .Select(static parameter => parameter.Identifier.ValueText)
                 .Where(static name => !string.IsNullOrEmpty(name))
                 .ToHashSet(StringComparer.Ordinal);
@@ -107,8 +109,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
     public override SyntaxNode? VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
     {
-        var parameterNames = node.ParameterList
-                .Parameters
+        var parameterNames = node.ParameterList.Parameters
                 .Select(static parameter => parameter.Identifier.ValueText)
                 .Where(static name => !string.IsNullOrEmpty(name))
                 .ToHashSet(StringComparer.Ordinal);
@@ -127,8 +128,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
     public override SyntaxNode? VisitAnonymousMethodExpression(AnonymousMethodExpressionSyntax node)
     {
-        var parameterNames = node.ParameterList?
-                                 .Parameters
+        var parameterNames = node.ParameterList?.Parameters
                                  .Select(static parameter => parameter.Identifier.ValueText)
                                  .Where(static name => !string.IsNullOrEmpty(name))
                                  .ToHashSet(StringComparer.Ordinal) 
@@ -146,16 +146,16 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitQueryExpression(QueryExpressionSyntax node)
+    public override SyntaxNode VisitQueryExpression(QueryExpressionSyntax node)
     {
-        var rewrittenFromExpression = (ExpressionSyntax) Visit(node.FromClause.Expression)!;
+        var rewrittenFromExpression = (ExpressionSyntax) Visit(node.FromClause.Expression);
         var rewrittenFrom = node.FromClause.WithExpression(rewrittenFromExpression);
 
         PushQueryVariable(node.FromClause.Identifier.ValueText);
 
         try
         {
-            var rewrittenBody = (QueryBodySyntax)Visit(node.Body)!;
+            var rewrittenBody = (QueryBodySyntax)Visit(node.Body);
             return node.WithFromClause(rewrittenFrom).WithBody(rewrittenBody);
         }
         finally
@@ -164,7 +164,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitQueryBody(QueryBodySyntax node)
+    public override SyntaxNode VisitQueryBody(QueryBodySyntax node)
     {
         var rewrittenClauses = new List<QueryClauseSyntax>();
 
@@ -174,30 +174,24 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
             {
                 case FromClauseSyntax fromClause:
                 {
-                    var rewrittenExpression = (ExpressionSyntax) Visit(fromClause.Expression)!;
-
+                    var rewrittenExpression = (ExpressionSyntax) Visit(fromClause.Expression);
                     rewrittenClauses.Add(fromClause.WithExpression(rewrittenExpression));
-
                     PushQueryVariable(fromClause.Identifier.ValueText);
-
                     break;
                 }
 
                 case LetClauseSyntax letClause:
                 {
-                    var rewrittenExpression = (ExpressionSyntax)Visit(letClause.Expression)!;
-
+                    var rewrittenExpression = (ExpressionSyntax)Visit(letClause.Expression);
                     rewrittenClauses.Add(letClause.WithExpression(rewrittenExpression));
-
                     PushQueryVariable(letClause.Identifier.ValueText);
-
                     break;
                 }
 
                 case JoinClauseSyntax joinClause:
                 {
-                    var rewrittenInExpression = (ExpressionSyntax)Visit(joinClause.InExpression)!;
-                    var rewrittenLeftExpression = (ExpressionSyntax)Visit(joinClause.LeftExpression)!;
+                    var rewrittenInExpression = (ExpressionSyntax)Visit(joinClause.InExpression);
+                    var rewrittenLeftExpression = (ExpressionSyntax)Visit(joinClause.LeftExpression);
                     var rewrittenRightExpression = VisitJoinRightExpression(joinClause);
 
                     var rewrittenJoin = joinClause
@@ -221,13 +215,13 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
                 default:
                 {
-                    rewrittenClauses.Add((QueryClauseSyntax)Visit(clause)!);
+                    rewrittenClauses.Add((QueryClauseSyntax)Visit(clause));
                     break;
                 }
             }
         }
 
-        var rewrittenSelectOrGroup = (SelectOrGroupClauseSyntax)Visit(node.SelectOrGroup)!;
+        var rewrittenSelectOrGroup = (SelectOrGroupClauseSyntax)Visit(node.SelectOrGroup);
 
         QueryContinuationSyntax? rewrittenContinuation = null;
 
@@ -239,7 +233,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
             try
             {
-                var rewrittenContinuationBody = (QueryBodySyntax)Visit(node.Continuation.Body)!;
+                var rewrittenContinuationBody = (QueryBodySyntax)Visit(node.Continuation.Body);
                 rewrittenContinuation = node.Continuation.WithBody(rewrittenContinuationBody);
             }
             finally
@@ -255,9 +249,9 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
             .WithContinuation(rewrittenContinuation);
     }
 
-    public override SyntaxNode? VisitForEachStatement(ForEachStatementSyntax node)
+    public override SyntaxNode VisitForEachStatement(ForEachStatementSyntax node)
     {
-        var rewrittenExpression = (ExpressionSyntax)Visit(node.Expression)!;
+        var rewrittenExpression = (ExpressionSyntax)Visit(node.Expression);
 
         var names = new HashSet<string>(StringComparer.Ordinal)
             {
@@ -268,7 +262,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         try
         {
-            var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+            var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
             return node.WithExpression(rewrittenExpression).WithStatement(rewrittenStatement);
         }
         finally
@@ -277,10 +271,10 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode?
+    public override SyntaxNode
         VisitForEachVariableStatement(ForEachVariableStatementSyntax node)
     {
-        var rewrittenExpression = (ExpressionSyntax)Visit(node.Expression)!;
+        var rewrittenExpression = (ExpressionSyntax)Visit(node.Expression);
 
         var variableNames = node.Variable
                 .DescendantNodesAndSelf()
@@ -293,9 +287,8 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         try
         {
-            var rewrittenVariable = (ExpressionSyntax)Visit(node.Variable)!;
-
-            var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+            var rewrittenVariable = (ExpressionSyntax)Visit(node.Variable);
+            var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
 
             return node.WithVariable(rewrittenVariable)
                 .WithExpression(rewrittenExpression)
@@ -307,10 +300,9 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitForStatement(ForStatementSyntax node)
+    public override SyntaxNode VisitForStatement(ForStatementSyntax node)
     {
-        var loopVariableNames = node.Declaration?
-                                    .Variables
+        var loopVariableNames = node.Declaration?.Variables
                                     .Select(static variable => variable.Identifier.ValueText)
                                     .ToHashSet(StringComparer.Ordinal)
                                 ?? [with(StringComparer.Ordinal)];
@@ -323,36 +315,28 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                                    .ToHashSet(StringComparer.Ordinal)
                                ?? [with(StringComparer.Ordinal)];
 
-        var rewrittenDeclaration = node.Declaration is null
-                ? null
-                : (VariableDeclarationSyntax?)Visit(node.Declaration);
+        var decls = node.Declaration is null ? null : (VariableDeclarationSyntax?)Visit(node.Declaration);
 
         PushLexicalScope(loopVariableNames);
 
         try
         {
-            var rewrittenInitializers = SyntaxFactory.SeparatedList(
-                    node.Initializers.Select(initializer => (ExpressionSyntax)Visit(initializer)!));
+            var inits = SyntaxFactory.SeparatedList(node.Initializers.Select(i => (ExpressionSyntax)Visit(i)));
 
             PushLexicalScope(patternVariables);
 
             try
             {
-                var rewrittenCondition = node.Condition is null
-                        ? null
-                        : (ExpressionSyntax?)Visit(node.Condition);
-
-                var rewrittenIncrementors = SyntaxFactory.SeparatedList(
-                        node.Incrementors.Select(incrementor => (ExpressionSyntax)Visit(incrementor)!));
-
-                var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+                var conds = node.Condition is null ? null : (ExpressionSyntax?)Visit(node.Condition);
+                var incs = SyntaxFactory.SeparatedList(node.Incrementors.Select(inc => (ExpressionSyntax)Visit(inc)));
+                var statements = (StatementSyntax)Visit(node.Statement);
 
                 return node
-                    .WithDeclaration(rewrittenDeclaration)
-                    .WithInitializers(rewrittenInitializers)
-                    .WithCondition(rewrittenCondition)
-                    .WithIncrementors(rewrittenIncrementors)
-                    .WithStatement(rewrittenStatement);
+                    .WithDeclaration(decls)
+                    .WithInitializers(inits)
+                    .WithCondition(conds)
+                    .WithIncrementors(incs)
+                    .WithStatement(statements);
             }
             finally
             {
@@ -391,17 +375,16 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitIfStatement(IfStatementSyntax node)
+    public override SyntaxNode VisitIfStatement(IfStatementSyntax node)
     {
-        var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition)!;
-
+        var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition);
         var patternVariables = GetPatternVariableNames(node.Condition);
 
         PushLexicalScope(patternVariables);
 
         try
         {
-            var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+            var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
 
             var rewrittenElse = node.Else is null ? null : (ElseClauseSyntax?)Visit(node.Else);
 
@@ -416,7 +399,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitWhileStatement(WhileStatementSyntax node)
+    public override SyntaxNode VisitWhileStatement(WhileStatementSyntax node)
     {
         var patternVariables = GetPatternVariableNames(node.Condition);
 
@@ -424,8 +407,8 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         try
         {
-            var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition)!;
-            var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+            var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition);
+            var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
 
             return node.WithCondition(rewrittenCondition).WithStatement(rewrittenStatement);
         }
@@ -435,7 +418,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitDoStatement(DoStatementSyntax node)
+    public override SyntaxNode VisitDoStatement(DoStatementSyntax node)
     {
         var patternVariables = node.Condition
                 .DescendantNodesAndSelf()
@@ -444,13 +427,13 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                 .Where(static name => !string.IsNullOrEmpty(name))
                 .ToHashSet(StringComparer.Ordinal);
 
-        var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+        var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
 
         PushLexicalScope(patternVariables);
 
         try
         {
-            var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition)!;
+            var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition);
             return node.WithStatement(rewrittenStatement).WithCondition(rewrittenCondition);
         }
         finally
@@ -469,9 +452,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                 .ToHashSet(StringComparer.Ordinal);
 
         if (patternVariables.Count == 0)
-        {
             return base.VisitSwitchSection(node);
-        }
 
         PushLexicalScope(patternVariables);
 
@@ -495,9 +476,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                 .ToHashSet(StringComparer.Ordinal);
 
         if (patternVariables.Count == 0)
-        {
             return base.VisitSwitchExpressionArm(node);
-        }
 
         PushLexicalScope(patternVariables);
 
@@ -514,9 +493,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
     public override SyntaxNode? VisitUsingStatement(UsingStatementSyntax node)
     {
         if (node.Declaration is null)
-        {
             return base.VisitUsingStatement(node);
-        }
 
         var variableNames = node.Declaration
                 .Variables
@@ -528,9 +505,8 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         try
         {
-            var rewrittenDeclaration = (VariableDeclarationSyntax)Visit(node.Declaration)!;
-
-            var rewrittenStatement = (StatementSyntax)Visit(node.Statement)!;
+            var rewrittenDeclaration = (VariableDeclarationSyntax)Visit(node.Declaration);
+            var rewrittenStatement = (StatementSyntax)Visit(node.Statement);
 
             return node
                 .WithDeclaration(rewrittenDeclaration)
@@ -545,11 +521,9 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
     public override SyntaxNode? VisitBinaryExpression(BinaryExpressionSyntax node)
     {
         if (!node.IsKind(SyntaxKind.LogicalAndExpression) && !node.IsKind(SyntaxKind.LogicalOrExpression))
-        {
             return base.VisitBinaryExpression(node);
-        }
 
-        var rewrittenLeft = (ExpressionSyntax)Visit(node.Left)!;
+        var rewrittenLeft = (ExpressionSyntax)Visit(node.Left);
 
         var patternVariables = node.Left
                 .DescendantNodesAndSelf()
@@ -560,22 +534,16 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         if (patternVariables.Count == 0)
         {
-            var rewrittenRight = (ExpressionSyntax)Visit(node.Right)!;
-
-            return node
-                .WithLeft(rewrittenLeft)
-                .WithRight(rewrittenRight);
+            var rewrittenRight = (ExpressionSyntax)Visit(node.Right);
+            return node.WithLeft(rewrittenLeft).WithRight(rewrittenRight);
         }
 
         PushLexicalScope(patternVariables);
 
         try
         {
-            var rewrittenRight = (ExpressionSyntax)Visit(node.Right)!;
-
-            return node
-                .WithLeft(rewrittenLeft)
-                .WithRight(rewrittenRight);
+            var rewrittenRight = (ExpressionSyntax)Visit(node.Right);
+            return node.WithLeft(rewrittenLeft).WithRight(rewrittenRight);
         }
         finally
         {
@@ -583,9 +551,9 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
         }
     }
 
-    public override SyntaxNode? VisitConditionalExpression(ConditionalExpressionSyntax node)
+    public override SyntaxNode VisitConditionalExpression(ConditionalExpressionSyntax node)
     {
-        var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition)!;
+        var rewrittenCondition = (ExpressionSyntax)Visit(node.Condition);
 
         var patternVariables = node.Condition
                 .DescendantNodesAndSelf()
@@ -596,9 +564,8 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         if (patternVariables.Count == 0)
         {
-            var rewrittenWhenTrue = (ExpressionSyntax)Visit(node.WhenTrue)!;
-
-            var rewrittenWhenFalse = (ExpressionSyntax)Visit(node.WhenFalse)!;
+            var rewrittenWhenTrue = (ExpressionSyntax)Visit(node.WhenTrue);
+            var rewrittenWhenFalse = (ExpressionSyntax)Visit(node.WhenFalse);
 
             return node
                 .WithCondition(rewrittenCondition)
@@ -617,24 +584,24 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
             try
             {
-                rewrittenTrueBranch = (ExpressionSyntax)Visit(node.WhenTrue)!;
+                rewrittenTrueBranch = (ExpressionSyntax)Visit(node.WhenTrue);
             }
             finally
             {
                 _shadowedScopes.Pop();
             }
 
-            rewrittenFalseBranch = (ExpressionSyntax)Visit(node.WhenFalse)!;
+            rewrittenFalseBranch = (ExpressionSyntax)Visit(node.WhenFalse);
         }
         else
         {
-            rewrittenTrueBranch = (ExpressionSyntax)Visit(node.WhenTrue)!;
+            rewrittenTrueBranch = (ExpressionSyntax)Visit(node.WhenTrue);
 
             PushLexicalScope(patternVariables);
 
             try
             {
-                rewrittenFalseBranch = (ExpressionSyntax)Visit(node.WhenFalse)!;
+                rewrittenFalseBranch = (ExpressionSyntax)Visit(node.WhenFalse);
             }
             finally
             {
@@ -654,9 +621,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
 
         if (IsShadowed(name))
-        {
             return base.VisitIdentifierName(node);
-        }
 
         /*
          * Do not rewrite the name portion of an
@@ -669,9 +634,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
          * Length must not become self.Length.
          */
         if (node.Parent is MemberAccessExpressionSyntax memberAccess && memberAccess.Name == node)
-        {
             return base.VisitIdentifierName(node);
-        }
 
         /*
          * A real CLR instance member becomes:
@@ -679,9 +642,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
          *     self.FirstName
          */
         if (_clrMembers.Contains(name))
-        {
             return CreateSelfMemberAccess(node);
-        }
 
         /*
          * A runtime method invocation becomes:
@@ -689,9 +650,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
          *     ((dynamic)self).DisplayName()
          */
         if (_runtimeMethods.Contains(name) && node.Parent is InvocationExpressionSyntax invocation && invocation.Expression == node)
-        {
             return CreateDynamicSelfMemberAccess(node);
-        }
 
         /*
          * A runtime property becomes:
@@ -699,9 +658,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
          *     ((dynamic)self).Nickname
          */
         if (_runtimeProperties.Contains(name))
-        {
             return CreateDynamicSelfMemberAccess(node);
-        }
 
         return base.VisitIdentifierName(node);
     }
@@ -714,7 +671,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
 
         try
         {
-            return (ExpressionSyntax)Visit(joinClause.RightExpression)!;
+            return (ExpressionSyntax)Visit(joinClause.RightExpression);
         }
         finally
         {
@@ -751,14 +708,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
     private void PushQueryVariable(string name)
     {
         if (string.IsNullOrEmpty(name)) return;
-
-        _shadowedScopes.Push(
-            new ScopeFrame(
-                [
-                    with(StringComparer.Ordinal),
-                    name
-                ],
-                true));
+        _shadowedScopes.Push(new ScopeFrame([with(StringComparer.Ordinal), name], true));
     }
 
     private List<ScopeFrame> RemoveQueryScopes()
@@ -785,10 +735,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
     {
         foreach (var scope in _shadowedScopes)
         {
-            if (scope.Names.Contains(name))
-            {
-                return true;
-            }
+            if (scope.Names.Contains(name)) return true;
         }
 
         return false;
@@ -825,8 +772,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                  */
                 if (variable.Initializer is not null)
                 {
-                    foreach (var designation
-                             in variable
+                    foreach (var designation in variable
                                  .Initializer
                                  .Value
                                  .DescendantNodesAndSelf()
@@ -835,9 +781,7 @@ public sealed class SelfMemberRewriter : CSharpSyntaxRewriter
                         var name = designation.Identifier.ValueText;
 
                         if (!string.IsNullOrEmpty(name))
-                        {
                             yield return name;
-                        }
                     }
                 }
             }

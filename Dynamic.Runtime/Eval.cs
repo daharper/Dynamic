@@ -6,12 +6,8 @@
 public static class Eval
 {
     public static object? Run(string source)
-    {
-        return RuntimeCompiler.Evaluate(source);
-    }
+        => RuntimeCompiler.Evaluate(source);
 
     public static T Run<T>(string source)
-    {
-        return (T)Run(source)!;
-    }
+        => (T)Run(source)!;
 }

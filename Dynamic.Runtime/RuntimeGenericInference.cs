@@ -8,17 +8,12 @@ public static class RuntimeGenericInference
     {
         var genericParameters = method.GetGenericArguments();
         var parameters = method.GetParameters().Skip(1).ToArray();
-
         var inferred = new Dictionary<Type, Type>();
 
         for (var i = 0; i < parameters.Length; i++)
         {
             var parameterType = parameters[i].ParameterType;
-
-            var argument = arguments[i]
-                           ?? throw new InvalidOperationException(
-                               "Cannot infer a generic type argument from null.");
-
+            var argument = arguments[i] ?? throw new InvalidOperationException("Cannot infer a generic type argument from null.");
             var argumentType = argument.GetType();
 
             // T ← string
@@ -31,13 +26,11 @@ public static class RuntimeGenericInference
             // IEnumerable<T> ← string[]
             if (parameterType.IsGenericType)
             {
-                var genericDefinition =
-                    parameterType.GetGenericTypeDefinition();
+                var genericDefinition = parameterType.GetGenericTypeDefinition();
 
                 Type? matchingType = null;
 
-                if (argumentType.IsGenericType &&
-                    argumentType.GetGenericTypeDefinition() == genericDefinition)
+                if (argumentType.IsGenericType && argumentType.GetGenericTypeDefinition() == genericDefinition)
                 {
                     matchingType = argumentType;
                 }
@@ -45,21 +38,13 @@ public static class RuntimeGenericInference
                 {
                     matchingType = argumentType
                         .GetInterfaces()
-                        .FirstOrDefault(type =>
-                            type.IsGenericType &&
-                            type.GetGenericTypeDefinition() == genericDefinition);
+                        .FirstOrDefault(type => type.IsGenericType && type.GetGenericTypeDefinition() == genericDefinition);
                 }
 
-                if (matchingType is null)
-                {
-                    continue;
-                }
+                if (matchingType is null) continue;
 
-                var parameterArguments =
-                    parameterType.GetGenericArguments();
-
-                var argumentArguments =
-                    matchingType.GetGenericArguments();
+                var parameterArguments = parameterType.GetGenericArguments();
+                var argumentArguments = matchingType.GetGenericArguments();
 
                 for (var j = 0; j < parameterArguments.Length; j++)
                 {
@@ -78,14 +63,9 @@ public static class RuntimeGenericInference
             .ToArray();
     }
 
-    private static void AddInference(
-        Dictionary<Type, Type> inferred,
-        Type genericParameter,
-        Type inferredType)
+    private static void AddInference(Dictionary<Type, Type> inferred, Type genericParameter, Type inferredType)
     {
-        if (inferred.TryGetValue(
-                genericParameter,
-                out var existingType))
+        if (inferred.TryGetValue(genericParameter, out var existingType))
         {
             if (existingType != inferredType)
             {

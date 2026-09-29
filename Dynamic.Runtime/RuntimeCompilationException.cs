@@ -8,10 +8,7 @@ public sealed class RuntimeCompilationException : Exception
 
     public IReadOnlyList<Diagnostic> Diagnostics { get; }
 
-    public RuntimeCompilationException(
-        string source,
-        string generatedSource,
-        IReadOnlyList<Diagnostic> diagnostics)
+    public RuntimeCompilationException(string source, string generatedSource, IReadOnlyList<Diagnostic> diagnostics)
         : base(CreateMessage(diagnostics))
     {
         Source = source;
@@ -20,7 +17,5 @@ public sealed class RuntimeCompilationException : Exception
     }
 
     private static string CreateMessage(IReadOnlyList<Diagnostic> diagnostics)
-    {
-        return string.Join(Environment.NewLine, diagnostics.Select(static diagnostic => diagnostic.ToString()));
-    }
+        => string.Join(Environment.NewLine, diagnostics.Select(static d => d.ToString()));
 }

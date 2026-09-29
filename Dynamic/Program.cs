@@ -24,13 +24,9 @@ r.Desirable.USA.Options = Option.Remote | Option.AnyOnRelocation;
 
 r.Achievements.Mvp.Organisation = "Embarcadero";
 
-r.Companies.HeuLabs(
-    "HeuLabs was a fast-growing, award-winning, innovative Singaporean EdTech startup", CompanyScale.Startup);
+r.Companies.HeuLabs("HeuLabs was a fast-growing, award-winning, innovative Singaporean EdTech startup", CompanyScale.Startup);
+r.Companies.STEngineering("Global technology engineering group with customers in over 100 countries.", CompanyScale.Enterprise);
 
-r.Companies.STEngineering(
-    "Global technology engineering group with customers in over 100 countries.", CompanyScale.Enterprise);
-
-r.Highlights.HeuLabs.Description 
-    = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
+r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
 
 r.Show();

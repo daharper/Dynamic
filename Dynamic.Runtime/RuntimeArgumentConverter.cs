@@ -11,17 +11,12 @@ internal static class RuntimeArgumentConverter
     {
         var hasParamsArray = parameters.Length > 0 && parameters[^1].GetCustomAttribute<ParamArrayAttribute>() is not null;
 
-        if (!hasParamsArray)
-        {
-            return TryPrepareOrdinaryArguments(parameters, arguments, out binding);
-        }
-
-        return TryPrepareParamsArguments(parameters, arguments, out binding);
+        return !hasParamsArray 
+            ? TryPrepareOrdinaryArguments(parameters, arguments, out binding) 
+            : TryPrepareParamsArguments(parameters, arguments, out binding);
     }
 
-    private static bool TryPrepareOrdinaryArguments(
-        ParameterInfo[] parameters, object?[] arguments,
-        out RuntimeArgumentBinding binding)
+    private static bool TryPrepareOrdinaryArguments(ParameterInfo[] parameters, object?[] arguments, out RuntimeArgumentBinding binding)
     {
         if (arguments.Length > parameters.Length)
         {
@@ -39,7 +34,6 @@ internal static class RuntimeArgumentConverter
         }
 
         var prepared = new object?[parameters.Length];
-
         var score = 0;
 
         for (var i = 0; i < arguments.Length; i++)
@@ -75,15 +69,10 @@ internal static class RuntimeArgumentConverter
         out RuntimeArgumentBinding binding)
     {
         var paramsIndex = parameters.Length - 1;
-
         var paramsParameter = parameters[paramsIndex];
-
         var paramsElementType = paramsParameter.ParameterType.GetElementType()!;
-
         var prepared = new object?[parameters.Length];
-
         var score = 0;
-
         var suppliedFixedArgumentCount = Math.Min(arguments.Length, paramsIndex);
 
         // Prepare the ordinary parameters that were supplied.
@@ -156,7 +145,6 @@ internal static class RuntimeArgumentConverter
          *     Sum(new[] { 10, 20, 30 })
          */
         var paramsArgumentCount = Math.Max(0, arguments.Length - paramsIndex);
-
         var paramsArray = Array.CreateInstance(paramsElementType, paramsArgumentCount);
 
         for (var i = 0; i < paramsArgumentCount; i++)

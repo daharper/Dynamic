@@ -7,11 +7,8 @@ public static class ActiveRuntime
     private static readonly HashSet<string> RegisteredNamespaces = [];
     private static readonly HashSet<Assembly> RegisteredAssemblies = [];
 
-    public static IEnumerable<string> Namespaces =>
-        RegisteredNamespaces;
-
-    public static IEnumerable<Assembly> Assemblies =>
-        RegisteredAssemblies;
+    public static IEnumerable<string> Namespaces => RegisteredNamespaces;
+    public static IEnumerable<Assembly> Assemblies => RegisteredAssemblies;
 
     public static void Register(params Type[] types)
     {

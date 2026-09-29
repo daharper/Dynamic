@@ -17,20 +17,13 @@ internal static class RuntimeMessageParser
 
         var openParen = source.IndexOf('(');
 
-        if (openParen >= 0)
-        {
-            return ParseParenthesized(source, openParen);
-        }
-
-        return ParseWhitespaceSeparated(source);
+        return openParen >= 0 ? ParseParenthesized(source, openParen) : ParseWhitespaceSeparated(source);
     }
 
     private static RuntimeMessage ParseParenthesized(string source, int openParen)
     {
         if (!source.EndsWith(')'))
-        {
             throw new FormatException("Expected ')' at the end of the message.");
-        }
 
         var name = source[..openParen].Trim();
 
@@ -47,9 +40,7 @@ internal static class RuntimeMessageParser
         var tokens = Tokenize(source, commaSeparated: false);
 
         if (tokens.Count == 0)
-        {
             throw new FormatException("Message cannot be empty.");
-        }
 
         var name = tokens[0];
 
@@ -65,14 +56,9 @@ internal static class RuntimeMessageParser
 
     private static object?[] ParseArguments(string source, bool commaSeparated)
     {
-        if (string.IsNullOrWhiteSpace(source))
-        {
-            return [];
-        }
-
-        return Tokenize(source, commaSeparated)
-            .Select(ParseValue)
-            .ToArray();
+        return string.IsNullOrWhiteSpace(source) 
+            ? [] 
+            : Tokenize(source, commaSeparated).Select(ParseValue).ToArray();
     }
 
     private static List<string> Tokenize(string source, bool commaSeparated)
@@ -93,7 +79,6 @@ internal static class RuntimeMessageParser
                 {
                     quote = null;
                 }
-
                 continue;
             }
 
@@ -101,7 +86,6 @@ internal static class RuntimeMessageParser
             {
                 quote = character;
                 current.Append(character);
-
                 continue;
             }
 
@@ -117,9 +101,7 @@ internal static class RuntimeMessageParser
         }
 
         if (quote is not null)
-        {
             throw new FormatException("Unterminated quoted string.");
-        }
 
         AddToken(tokens, current);
 
@@ -140,30 +122,20 @@ internal static class RuntimeMessageParser
 
     private static object? ParseValue(string token)
     {
-        if (token.Length >= 2 && token[0] == token[^1] && token[0] is '"' or '\'')
-        {
+        if (token.Length >= 2 && token[0] == token[^1] && token[0] is '"' or '\'') 
             return token[1..^1];
-        }
 
-        if (string.Equals(token, "null", StringComparison.OrdinalIgnoreCase))
-        {
+        if (string.Equals(token, "null", StringComparison.OrdinalIgnoreCase)) 
             return null;
-        }
 
         if (bool.TryParse(token, out var boolean))
-        {
             return boolean;
-        }
 
         if (int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integer))
-        {
             return integer;
-        }
 
         if (decimal.TryParse(token, NumberStyles.Number, CultureInfo.InvariantCulture, out var decimalValue))
-        {
             return decimalValue;
-        }
 
         throw new FormatException($"Could not parse argument '{token}'.");
     }
@@ -171,13 +143,9 @@ internal static class RuntimeMessageParser
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-        {
             throw new FormatException("Message name cannot be empty.");
-        }
 
         if (!SyntaxFacts.IsValidIdentifier(name))
-        {
             throw new FormatException($"'{name}' is not a valid message name.");
-        }
     }
 }

@@ -20,10 +20,8 @@ public static class RuntimeCompiler
         var members = ParseMembers(source);
 
         if (members.Methods.Count == 0 && members.Properties.Count == 0)
-        {
             return current;
-        }
-
+        
         var runtimePropertyNames = current.PropertyNames
             .Concat(members.Properties.Select(static property => property.Identifier.ValueText))
             .ToHashSet(StringComparer.Ordinal);
@@ -42,7 +40,6 @@ public static class RuntimeCompiler
             members.Properties,
             runtimePropertyNames,
             runtimeMethodNames);
-
 
         var syntaxTree = CSharpSyntaxTree.ParseText(generatedSource, new CSharpParseOptions(LanguageVersion.Preview));
 
@@ -63,9 +60,7 @@ public static class RuntimeCompiler
         var emit = compilation.Emit(pe);
 
         if (!emit.Success)
-        {
             throw CreateCompilationException(source, generatedSource, emit.Diagnostics);
-        }
 
         pe.Position = 0;
 
@@ -85,9 +80,7 @@ public static class RuntimeCompiler
         var members = ParseMembers(source);
 
         if (members.Methods.Count == 0 && members.Properties.Count == 0)
-        {
             return current;
-        }
 
         var runtimePropertyNames = ActiveClassRegistry<TSelf>.Current
             .PropertyNames
@@ -131,9 +124,7 @@ public static class RuntimeCompiler
         var emit = compilation.Emit(pe);
 
         if (!emit.Success)
-        {
             throw CreateCompilationException(source, generatedSource, emit.Diagnostics);
-        }
 
         pe.Position = 0;
 
@@ -366,7 +357,6 @@ public static class RuntimeCompiler
         var name = method.Identifier.ValueText;
         var implementationName = $"__Implementation_{index}_{name}";
         var invokeName = $"__Invoke_{name}";
-
         var returnType = method.ReturnType.ToFullString().Trim();
 
         var unsafeModifier = method.Modifiers.Any(static modifier => modifier.IsKind(SyntaxKind.UnsafeKeyword))
@@ -374,16 +364,9 @@ public static class RuntimeCompiler
                 : string.Empty;
 
         var typeParameters = method.TypeParameterList?.ToFullString().Trim() ?? string.Empty;
-
         var isGeneric = method.TypeParameterList is not null;
-
         var parameters = method.ParameterList.Parameters;
-
-        var implementationParameters =
-            new List<string>
-            {
-                $"{selfType} self"
-            };
+        var implementationParameters = new List<string> { $"{selfType} self" };
 
         implementationParameters.AddRange(parameters.Select(static parameter => parameter.ToFullString().Trim()));
 
@@ -489,9 +472,7 @@ public static class RuntimeCompiler
                 .FirstOrDefault(static accessor => accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
 
         if (getter is null)
-        {
             throw new NotSupportedException($"Property '{name}' must have a getter.");
-        }
 
         var rewriter = new SelfMemberRewriter(typeof(TSelf), runtimePropertyNames, runtimeMethodNames);
         var rewrittenGetter = (AccessorDeclarationSyntax)rewriter.Visit(getter)!;
@@ -538,12 +519,6 @@ public static class RuntimeCompiler
 
     private static void ValidateMethod(MethodDeclarationSyntax method)
     {
-        //if (method.TypeParameterList is not null)
-        //{
-        //    throw new NotSupportedException(
-        //        $"Generic runtime method '{method.Identifier.ValueText}' is not supported yet.");
-        //}
-
         foreach (var parameter in method.ParameterList.Parameters)
         {
             if (parameter.Modifiers.Any(static modifier =>
@@ -592,11 +567,7 @@ public static class RuntimeCompiler
     private static void AddAssembly(HashSet<string> paths, Assembly assembly)
     {
         if (assembly.IsDynamic) return;
-
-        if (string.IsNullOrWhiteSpace(assembly.Location))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(assembly.Location)) return;
 
         paths.Add(assembly.Location);
     }
@@ -604,9 +575,7 @@ public static class RuntimeCompiler
     private static string GetCSharpTypeName(Type type)
     {
         if (type.IsGenericType)
-        {
             throw new NotSupportedException($"Generic active types are not supported yet: '{type}'.");
-        }
 
         var name = type.FullName ?? throw new InvalidOperationException($"Type '{type}' has no FullName.");
 

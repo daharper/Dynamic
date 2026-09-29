@@ -48,25 +48,18 @@ internal static class RuntimeMethodBinder
                 .Where(item => item.Binding.Score == candidate.Binding.Score)
                 .ToArray();
 
-        if (tiedCandidates.Length == 1)
-        {
-            return candidate;
-        }
+        if (tiedCandidates.Length == 1) return candidate;
 
         ClrMethodCandidate? best = null;
 
         for (var i = 0; i < tiedCandidates.Length; i++)
         {
             var current = tiedCandidates[i];
-
             var betterThanAll = true;
 
             for (var j = 0; j < tiedCandidates.Length; j++)
             {
-                if (i == j)
-                {
-                    continue;
-                }
+                if (i == j) continue;
 
                 if (!IsMoreSpecific(current.Method, tiedCandidates[j].Method, message.Arguments))
                 {
@@ -75,23 +68,16 @@ internal static class RuntimeMethodBinder
                 }
             }
 
-            if (!betterThanAll)
-            {
-                continue;
-            }
+            if (!betterThanAll) continue;
 
             if (best is not null)
-            {
                 throw CreateAmbiguousMatchException(message.Name);
-            }
-
+            
             best = current;
         }
 
         if (best is null)
-        {
             throw CreateAmbiguousMatchException(message.Name);
-        }
 
         return best.Value;
     }
@@ -107,10 +93,7 @@ internal static class RuntimeMethodBinder
             var candidateType = candidateParameters[i].ParameterType;
             var otherType = otherParameters[i].ParameterType;
 
-            if (candidateType == otherType)
-            {
-                continue;
-            }
+            if (candidateType == otherType) continue;
 
             if (otherType.IsAssignableFrom(candidateType))
             {
