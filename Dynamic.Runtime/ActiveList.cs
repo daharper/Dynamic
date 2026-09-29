@@ -6,6 +6,29 @@ using System.Text;
 
 namespace Dynamic.Runtime;
 
+/// <summary>
+/// A dynamically composable list that combines ordinary <see cref="IList{T}"/>
+/// behavior with the runtime capabilities of <see cref="ActiveObject{TSelf}"/>.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Dynamic member access can materialize values from member names and arguments.
+/// Values produced through dynamic get, invoke, and set operations are added
+/// idempotently according to the configured <see cref="IEqualityComparer{T}"/>.
+/// If an equivalent value already exists, the existing value is preserved.
+/// </para>
+/// <para>
+/// A factory may be supplied to construct values from dynamic member names.
+/// Otherwise, strings use the member name directly, primitive values use CLR
+/// conversion, and other types may be constructed using their available
+/// constructors.
+/// </para>
+/// <para>
+/// Equality-sensitive list operations use the configured comparer. The collection
+/// otherwise behaves as an ordinary mutable <see cref="IList{T}"/> and does not
+/// provide synchronization for concurrent access.
+/// </para>
+/// </remarks>
 public class ActiveList<T> : ActiveObject<ActiveList<T>>, IList<T>
 {
     private readonly List<T> _items = [];
@@ -78,9 +101,7 @@ public class ActiveList<T> : ActiveObject<ActiveList<T>>, IList<T>
     IEnumerator IEnumerable.GetEnumerator() =>
         GetEnumerator();
 
-    public override bool TryGetMember(
-        GetMemberBinder binder,
-        out object? result)
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         T item;
 
