@@ -33,7 +33,7 @@ public class ActiveList<T> : ActiveObject<ActiveList<T>>, IList<T>
 {
     private readonly List<T> _items = [];
 
-    private readonly Func<string, T>? _factory;
+    private Func<string, T>? _factory;
 
     private readonly IEqualityComparer<T> _comparer;
 
@@ -47,6 +47,12 @@ public class ActiveList<T> : ActiveObject<ActiveList<T>>, IList<T>
     {
         get => _items[index];
         set => _items[index] = value;
+    }
+
+    public Func<string, T> Factory
+    {
+        get => _factory!;
+        set => _factory = value;
     }
 
     public int Count => _items.Count;
@@ -216,5 +222,19 @@ public class ActiveList<T> : ActiveObject<ActiveList<T>>, IList<T>
         _items.Add(item);
         result = item;
         return true;
+    }
+
+    public T GetOrAdd(T item)
+    {
+        foreach (var existing in _items)
+        {
+            if (_comparer.Equals(existing, item))
+            {
+                return existing;
+            }
+        }
+
+        _items.Add(item);
+        return item;
     }
 }
