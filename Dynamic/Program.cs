@@ -29,4 +29,16 @@ r.Companies.STEngineering("Global technology engineering group with customers in
 
 r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
 
+// root skills
+r.Skills.Language();
+r.Skills.Design();
+
+r.Skills.CSharp.Parent = r.Skills.Language;
+r.Skills.Delphi.Parent = r.Skills.Language;
+
+r.Skills.OOD.Parent = r.Skills.Design;
+r.Skills.OOP.Parent = r.Skills.Design;
+r.Skills.AOP.Parent = r.Skills.Design;
+r.Skills.FP.Parent  = r.Skills.Design;
+
 r.Show();

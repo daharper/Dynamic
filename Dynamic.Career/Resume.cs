@@ -27,6 +27,8 @@ public sealed class Resume : ActiveObject<Resume>
 
     public dynamic Highlights { get; } = new ActiveList<Highlight>();
 
+    public dynamic Skills { get; } = new ActiveList<Skill>(n => new Skill(n), new SkillComparer());
+
     public void Show()
     {
         var output = $"""
@@ -72,6 +74,13 @@ public sealed class Resume : ActiveObject<Resume>
         foreach (var h in Highlights)
         {
             Console.WriteLine($"  • {h.Company.Name}: {h.Description}");
+        }
+
+        Console.WriteLine("Skills:");
+
+        foreach (var s in Skills)
+        {
+            Console.WriteLine($"  • {s.Name}: ({s.Parent?.Name ?? "none"})");
         }
     }
 }

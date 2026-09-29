@@ -52,6 +52,26 @@ public sealed record Preference(string Country, Option Options = Option.Remote)
     public Option Options { get; set; } = Options;
 }
 
+public sealed record Skill(string Name, Skill? Parent = null)
+{
+    public Skill? Parent { get; set; } = Parent;
+}
+
+public sealed class SkillComparer : IEqualityComparer<Skill>
+{
+    public bool Equals(Skill? x, Skill? y)
+    {
+        if (ReferenceEquals(x, y)) return true;
+
+        if (x is null || y is null) return false;
+
+        return StringComparer.OrdinalIgnoreCase.Equals(x.Name, y.Name);
+    }
+
+    public int GetHashCode(Skill obj)
+        => StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Name);
+}
+
 public sealed record Company(string Name, string Description = "", CompanyScale Scale = CompanyScale.NotSpecified)
 {
     public string Description { get; set; } = Description;
