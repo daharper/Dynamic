@@ -91,7 +91,9 @@ public sealed class Resume : ActiveObject<Resume>
 
         foreach (var s in Skills)
         {
-            Console.WriteLine($"  • {s.Name}");
+            var aliases = s.HasAlias ? "(" + string.Join(" ", s.Aliases) + ")" : "";
+
+            Console.WriteLine($"  • {s.Name} {aliases}");
 
             if (s.HasParent)
             {
@@ -129,6 +131,28 @@ public sealed class Resume : ActiveObject<Resume>
                     Console.WriteLine($"        • {memberOf.Name}");
                 }
             }
+
+            if (s.HasProperty)
+            {
+                Console.WriteLine("        [properties]");
+
+                foreach (var prop in s.Props)
+                {
+                    Console.WriteLine($"        • {prop.Key} = {s.AsStr(prop.Key)}");
+                }
+            }
+
+            if (s.HasNote)
+            {
+                Console.WriteLine("        [notes]");
+
+                foreach (var note in s.Notes)
+                {
+                    Console.WriteLine($"        • {note}");
+                }
+            }
         }
     }
+
+
 }

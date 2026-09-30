@@ -40,17 +40,57 @@ static void ByCode()
     var technologies = skills.Technologies;
     var languages = skills.Languages;
 
-    technologies.Includes(
-        languages.Generalizes(
-            skills.CSharp,
-            skills.ObjectPascal),
-        skills.DotNet.Includes(
-            skills.CSharp,
-            skills.DotNetCore),
-        skills.Delphi.Includes(
+    var delphi = skills.Delphi
+        .Let("Versions", new List<string>
+        {
+            "1", "2", "3", "4", "5", "6", "7",
+            "10", "XE", "11", "12", "13"
+        })
+        .Note("First used Delphi in 1998")
+        .Includes(
             skills.ObjectPascal,
             skills.RTL,
-            skills.VCL));
+            skills.VCL);
+
+    var dotNet = skills.DotNet
+        .Alias(".NET")
+        .Includes(
+            skills.CSharp,
+            skills.DotNetCore.Alias(".NET Core"));
+
+    skills.CSharp
+        .Alias("C#")
+        .Let("Versions", Enumerable.Range(1, 15)
+            .Select(i => i.ToString())
+            .ToList())
+        .Note("First used C# in 2001 whilst in beta");
+
+    skills.ObjectPascal.Alias("OP");
+
+    languages.Generalizes(skills.CSharp, skills.ObjectPascal);
+
+    technologies.Includes(languages, skills.CSharp, skills.ObjectPascal, dotNet, delphi);
+
+    //technologies
+    //    .Includes(
+    //        languages
+    //            .Generalizes(
+    //                skills.CSharp
+    //                    .Alias("C#")
+    //                    .Let("Versions", Enumerable.Range(1, 15).Select(i => i.ToString()).ToList())
+    //                    .Note("First used C# in 2001 whilst in beta"),
+    //                skills.ObjectPascal
+    //                    .Alias("OP")
+    //        ),
+    //        skills.DotNet.Alias(".NET")
+    //            .Includes(
+    //                skills.CSharp,
+    //                skills.DotNetCore.Alias(".NET Core")),
+    //                skills.Delphi
+    //                    .Let("Versions", new List<string> { "1", "2", "3", "4", "5", "6", "7", "10", "XE", "11", "12", "13" })
+    //                    .Note("First used C# in 1998")
+    //                    .Includes(skills.ObjectPascal, skills.RTL, skills.VCL)
+    //);
 
     r.Show();
 }

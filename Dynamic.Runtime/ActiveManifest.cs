@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
@@ -26,7 +27,15 @@ public abstract class ActiveManifest : DynamicObject
 
     public string Name { get; set; }
 
+    public List<string> Aliases { get; } = [];
+
     public List<Association> Associations { get; } = [];
+
+    public Dictionary<string, dynamic> Props { get; } = [];
+
+    public List<string> Notes { get; } = [];
+
+    public List<string> Tags { get; } = [];
 
     public IEnumerable<dynamic> AllMembers => Related(Relationship.Member);
 
@@ -52,6 +61,70 @@ public abstract class ActiveManifest : DynamicObject
     public bool HasUses => Has(Relationship.Uses);
 
     public bool IsUsed => Has(Relationship.UsedBy);
+
+    public bool HasAlias => Aliases.Count > 0;
+
+    public bool HasProperty => Props.Count > 0;
+
+    public bool HasNote => Notes.Count > 0;
+
+    public bool HasTag => Tags.Count > 0;
+
+    public dynamic Let(string name, dynamic value)
+    {
+        Props[name] = value;
+        return this;
+    }
+
+    public string AsStr(string name)
+    {
+        if (!Props.TryGetValue(name, out var value)) return "";
+
+        return value switch
+        {
+            null => "null",
+            string s => s,
+            IEnumerable<int> values => $"[{string.Join(", ", values)}]",
+            IEnumerable values => $"[{string.Join(", ", values.Cast<object>())}]",
+            _ => value.ToString()
+        };
+    }
+
+    public dynamic Alias(params string[] aliases)
+    {
+        foreach (var alias in aliases)
+        {
+            if (!Aliases.Contains(alias))
+            {
+                Aliases.Add(alias);
+            }
+        }
+
+        return this;
+    }
+
+
+    public bool IsKnownAs(string name) 
+        => StringComparer.OrdinalIgnoreCase.Equals(Name, name) 
+           || Aliases.Any(alias => StringComparer.OrdinalIgnoreCase.Equals(alias, name));
+
+    public dynamic Note(params string[] notes)
+    {
+        Notes.AddRange(notes);
+        return this;
+    }
+
+    public bool IsTag(string tag)
+    {
+        tag = tag.Trim().ToLowerInvariant();
+        return Tags.Contains(tag);
+    }
+
+    public dynamic Tag(params string[] tags)
+    {
+        Tags.AddRange(tags.Select(t => t.Trim().ToLowerInvariant()));
+        return this;
+    }
 
     public dynamic Uses(params ActiveManifest[] manifests)
     {
