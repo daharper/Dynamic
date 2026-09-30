@@ -28,12 +28,11 @@ public abstract class ActiveManifest : DynamicObject
 
     public List<Association> Associations { get; } = [];
 
-    public bool Has(Relationship relationship) 
-        => Associations.Any(a => a.Relationship == relationship);
-
-    public IEnumerable<dynamic> Members => Related(Relationship.Member);
+    public IEnumerable<dynamic> AllMembers => Related(Relationship.Member);
 
     public IEnumerable<dynamic> MemberOf => Related(Relationship.MemberOf);
+
+    public IEnumerable<dynamic> AllUses => Related(Relationship.Uses);
 
     public IEnumerable<dynamic> UsedBy => Related(Relationship.UsedBy);
 
@@ -42,6 +41,27 @@ public abstract class ActiveManifest : DynamicObject
 
     public IEnumerable<T> Related<T>(Relationship relationship) where T : ActiveManifest 
         => Related(relationship).OfType<T>();
+
+    public bool Has(Relationship relationship)
+        => Associations.Any(a => a.Relationship == relationship);
+
+    public bool HasMember => Has(Relationship.Member);
+
+    public bool IsMember => Has(Relationship.MemberOf);
+
+    public bool HasUses => Has(Relationship.Uses);
+
+    public bool IsUsed => Has(Relationship.UsedBy);
+
+    public dynamic Uses(params ActiveManifest[] manifests)
+    {
+        foreach (var manifest in manifests)
+        {
+            Associate(manifest, Relationship.Uses, Relationship.UsedBy);
+        }
+
+        return this;
+    }
 
     public dynamic Includes(params ActiveManifest[] manifests)
     {

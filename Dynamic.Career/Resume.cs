@@ -99,7 +99,7 @@ public sealed class Resume : ActiveObject<Resume>
                 Console.WriteLine($"        • {s.Parent.Name}");
             }
 
-            if (s.Has(Relationship.Child))
+            if (s.HasChild)
             {
                 Console.WriteLine("        [children]");
 
@@ -109,18 +109,18 @@ public sealed class Resume : ActiveObject<Resume>
                 }
             }
 
-            if (s.Has(Relationship.Member))
+            if (s.HasMember)
             {
                 Console.WriteLine("        [members]");
 
-                foreach (var member in s.Members)
+                foreach (var member in s.AllMembers)
                 {
                     Console.WriteLine($"        • {member.Name}");
                 }
             }
 
 
-            if (s.Has(Relationship.MemberOf))
+            if (s.IsMember)
             {
                 Console.WriteLine("        [member of]");
 

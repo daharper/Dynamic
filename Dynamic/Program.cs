@@ -52,18 +52,6 @@ static void ByCode()
             skills.RTL,
             skills.VCL));
 
-    //r.Skills.Technologies.Includes(
-    //    r.Skills.Languages.Generalizes(
-    //        r.Skills.CSharp,
-    //        r.Skills.ObjectPascal),
-    //    r.Skills.DotNet.Includes(
-    //        r.Skills.CSharp,
-    //        r.Skills.DotNetCore),
-    //    r.Skills.Delphi.Includes(
-    //        r.Skills.ObjectPascal,
-    //        r.Skills.RTL,
-    //        r.Skills.VCL));
-
     r.Show();
 }
 

@@ -17,6 +17,8 @@ public abstract class ActiveData<T> : ActiveManifest where T : ActiveData<T>
 
     public bool HasParent => Parent is not null;
 
+    public bool HasChild => Has(Relationship.Child);
+
     public IEnumerable<T> Children => Related<T>(Relationship.Child);
 
     public T Generalizes(params T[] data)
