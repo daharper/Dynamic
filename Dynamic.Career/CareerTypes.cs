@@ -58,39 +58,83 @@ public sealed record Skill
     public Skill(string name, Skill? parent = null)
     {
         Name = name;
-
-        if (parent is not null)
-            Parents.Add(parent);
+        Parent = parent;
     }
 
-    public List<Skill> Parents { get; } = [];
+    public Skill? Parent { get; set; }
 
     public List<Skill> Children { get; } = [];
 
-    public bool HasParent => Parents.Count > 0;
+    public List<Skill> Categories { get; } = [];
+
+    public bool HasParent => Parent is not null;
 
     public bool HasChild => Children.Count > 0;
+
+    public bool HasCategories => Categories.Count > 0;
 
     public Skill With(params Skill[] skills)
     {
         foreach (var skill in skills)
         {
-            // They don't have us as a parent
-            if (skill.Parents.All(p => p.Name != Name))
+            if (skill.HasParent)
             {
-                skill.Parents.Add(this);
+                if (skill.Categories.All(c => c.Name != Name))
+                    skill.Categories.Add(this);
+            }
+            else
+            {
+                skill.Parent = this;
             }
 
-            // We don't have them as a child
             if (Children.All(c => c.Name != skill.Name))
-            {
                 Children.Add(skill);
-            }
         }
 
         return this;
     }
 }
+
+//public sealed record Skill
+//{
+//    public string Name { get; set; } = "";
+
+//    public Skill(string name, Skill? parent = null)
+//    {
+//        Name = name;
+
+//        if (parent is not null)
+//            Parents.Add(parent);
+//    }
+
+//    public List<Skill> Parents { get; } = [];
+
+//    public List<Skill> Children { get; } = [];
+
+//    public bool HasParent => Parents.Count > 0;
+
+//    public bool HasChild => Children.Count > 0;
+
+//    public Skill With(params Skill[] skills)
+//    {
+//        foreach (var skill in skills)
+//        {
+//            // They don't have us as a parent
+//            if (skill.Parents.All(p => p.Name != Name))
+//            {
+//                skill.Parents.Add(this);
+//            }
+
+//            // We don't have them as a child
+//            if (Children.All(c => c.Name != skill.Name))
+//            {
+//                Children.Add(skill);
+//            }
+//        }
+
+//        return this;
+//    }
+//}
 
 public sealed class SkillComparer : IEqualityComparer<Skill>
 {

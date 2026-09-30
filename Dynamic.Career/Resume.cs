@@ -93,6 +93,12 @@ public sealed class Resume : ActiveObject<Resume>
         {
             Console.WriteLine($"  • {s.Name}");
 
+            if (s.HasParent)
+            {
+                Console.WriteLine("        [parent]");
+                Console.WriteLine($"        • {s.Parent.Name}");
+            }
+
             if (s.HasChild)
             {
                 Console.WriteLine("        [children]");
@@ -105,11 +111,11 @@ public sealed class Resume : ActiveObject<Resume>
 
             if (s.HasParent)
             {
-                Console.WriteLine("        [parents]");
+                Console.WriteLine("        [categories]");
 
-                foreach (var parent in s.Parents)
+                foreach (var category in s.Categories)
                 {
-                    Console.WriteLine($"        • {parent.Name}");
+                    Console.WriteLine($"        • {category.Name}");
                 }
             }
         }

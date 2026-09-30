@@ -6,8 +6,8 @@ Console.OutputEncoding = Encoding.UTF8;
 
 ActiveRuntime.Register(typeof(Resume));
 
-//ByCode();
-ByScript();
+ByCode();
+//ByScript();
 
 return;
 
@@ -36,15 +36,17 @@ static void ByCode()
 
     r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
 
-    r.Skills.Language.With(
-        r.Skills.CSharp, 
-        r.Skills.Delphi, 
-        r.Skills.Ruby,
-        r.Skills.Java,
-        r.Skills.Kotlin,
-        r.Skills.Cpp, 
-        r.Skills.CppCLI, 
-        r.Skills.IronRuby);
+    r.Skills.Technologies.With(
+        r.Skills.Languages.With(
+            r.Skills.CSharp,
+            r.Skills.ObjectPascal),
+        r.Skills.DotNet.With(
+            r.Skills.CSharp,
+            r.Skills.DotNetCore),
+        r.Skills.Delphi.With(
+            r.Skills.ObjectPascal,
+            r.Skills.RTL,
+            r.Skills.VCL));
 
     r.Show();
 }
