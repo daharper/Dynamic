@@ -36,17 +36,33 @@ static void ByCode()
 
     r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
 
-    r.Skills.Technologies.With(
-        r.Skills.Languages.Owns(
-            r.Skills.CSharp,
-            r.Skills.ObjectPascal),
-        r.Skills.DotNet.With(
-            r.Skills.CSharp,
-            r.Skills.DotNetCore),
-        r.Skills.Delphi.With(
-            r.Skills.ObjectPascal,
-            r.Skills.RTL,
-            r.Skills.VCL));
+    var skills = r.Skills;
+    var technologies = skills.Technologies;
+    var languages = skills.Languages;
+
+    technologies.Includes(
+        languages.Generalizes(
+            skills.CSharp,
+            skills.ObjectPascal),
+        skills.DotNet.Includes(
+            skills.CSharp,
+            skills.DotNetCore),
+        skills.Delphi.Includes(
+            skills.ObjectPascal,
+            skills.RTL,
+            skills.VCL));
+
+    //r.Skills.Technologies.Includes(
+    //    r.Skills.Languages.Generalizes(
+    //        r.Skills.CSharp,
+    //        r.Skills.ObjectPascal),
+    //    r.Skills.DotNet.Includes(
+    //        r.Skills.CSharp,
+    //        r.Skills.DotNetCore),
+    //    r.Skills.Delphi.Includes(
+    //        r.Skills.ObjectPascal,
+    //        r.Skills.RTL,
+    //        r.Skills.VCL));
 
     r.Show();
 }

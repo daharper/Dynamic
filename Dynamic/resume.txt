@@ -18,15 +18,19 @@ r.Companies.STEngineering("Global technology engineering group with customers in
              
 r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
              
-r.Skills.Technologies.With(
-    r.Skills.Languages.With(
-        r.Skills.CSharp,
-        r.Skills.ObjectPascal),
-    r.Skills.DotNet.With(
-        r.Skills.CSharp,
-        r.Skills.DotNetCore),
-    r.Skills.Delphi.With(
-        r.Skills.ObjectPascal,
-        r.Skills.RTL,
-        r.Skills.VCL));
+var skills = r.Skills;
+var technologies = skills.Technologies;
+var languages = skills.Languages;
+
+technologies.Includes(
+    languages.Generalizes(
+        skills.CSharp,
+        skills.ObjectPascal),
+    skills.DotNet.Includes(
+        skills.CSharp,
+        skills.DotNetCore),
+    skills.Delphi.Includes(
+        skills.ObjectPascal,
+        skills.RTL,
+        skills.VCL));
             
