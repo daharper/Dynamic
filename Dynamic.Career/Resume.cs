@@ -29,6 +29,17 @@ public sealed class Resume : ActiveObject<Resume>
 
     public dynamic Skills { get; } = new ActiveList<Skill>(n => new Skill(n), new SkillComparer());
 
+    public void AddSkill(Skill skill, params Skill[] childSkills)
+    {
+        skill = Skills.GetOrAdd(skill);
+
+        foreach (var childSkill in childSkills)
+        {
+            var sk = Skills.GetOrAdd(childSkill);
+            sk.Parent = skill;
+        }
+    }
+
     public void Show()
     {
         var output = $"""
@@ -80,7 +91,27 @@ public sealed class Resume : ActiveObject<Resume>
 
         foreach (var s in Skills)
         {
-            Console.WriteLine($"  • {s.Name}: ({s.Parent?.Name ?? "none"})");
+            Console.WriteLine($"  • {s.Name}");
+
+            if (s.HasChild)
+            {
+                Console.WriteLine("        [children]");
+
+                foreach (var child in s.Children)
+                {
+                    Console.WriteLine($"        • {child.Name}");
+                }
+            }
+
+            if (s.HasParent)
+            {
+                Console.WriteLine("        [parents]");
+
+                foreach (var parent in s.Parents)
+                {
+                    Console.WriteLine($"        • {parent.Name}");
+                }
+            }
         }
     }
 }

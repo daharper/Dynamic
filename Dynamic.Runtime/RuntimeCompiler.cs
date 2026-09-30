@@ -1,9 +1,10 @@
-﻿using System.Reflection;
-using System.Runtime.Loader;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Text;
 
 namespace Dynamic.Runtime;
 
@@ -539,7 +540,31 @@ public static class RuntimeCompiler
 
     private static bool IsVoid(MethodDeclarationSyntax method)
         => method.ReturnType is PredefinedTypeSyntax predefined && predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
-    
+
+    //private static IReadOnlyList<MetadataReference> GetMetadataReferences<TSelf>()
+    //{
+    //    var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    //    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+    //    {
+    //        if (assembly.IsDynamic) continue;
+
+    //        if (string.IsNullOrWhiteSpace(assembly.Location))
+    //        {
+    //            continue;
+    //        }
+
+    //        paths.Add(assembly.Location);
+    //    }
+
+    //    AddAssembly(paths, typeof(object).Assembly);
+    //    AddAssembly(paths, typeof(TSelf).Assembly);
+    //    AddAssembly(paths, typeof(ActiveObject<>).Assembly);
+    //    AddAssembly(paths, typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly);
+
+    //    return paths.Select(static path => MetadataReference.CreateFromFile(path)).ToArray();
+    //}
+
     private static IReadOnlyList<MetadataReference> GetMetadataReferences<TSelf>()
     {
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -547,11 +572,7 @@ public static class RuntimeCompiler
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             if (assembly.IsDynamic) continue;
-
-            if (string.IsNullOrWhiteSpace(assembly.Location))
-            {
-                continue;
-            }
+            if (string.IsNullOrWhiteSpace(assembly.Location)) continue;
 
             paths.Add(assembly.Location);
         }
@@ -561,7 +582,14 @@ public static class RuntimeCompiler
         AddAssembly(paths, typeof(ActiveObject<>).Assembly);
         AddAssembly(paths, typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly);
 
-        return paths.Select(static path => MetadataReference.CreateFromFile(path)).ToArray();
+        foreach (var assembly in ActiveRuntime.Assemblies)
+        {
+            AddAssembly(paths, assembly);
+        }
+
+        return paths
+            .Select(static path => MetadataReference.CreateFromFile(path))
+            .ToArray();
     }
 
     private static void AddAssembly(HashSet<string> paths, Assembly assembly)
@@ -604,7 +632,18 @@ public static class RuntimeCompiler
         var assemblyName = $"DynamicRuntime.Eval.{Guid.NewGuid():N}";
         var expression = SyntaxFactory.ParseExpression(source);
         var isExpression = !expression.ContainsDiagnostics;
-        var body = isExpression ? $"return {source};" : source;
+
+        //var body = isExpression ? $"return {source};" : source;
+
+        var body = isExpression
+            ? $"return {source};"
+            : $"{source}{Environment.NewLine}return null;";
+
+        var registeredUsings = string.Join(
+            Environment.NewLine,
+            ActiveRuntime.Namespaces
+                .OrderBy(static value => value)
+                .Select(static value => $"using {value};"));
 
         var generatedSource =
             $$"""
@@ -614,6 +653,7 @@ public static class RuntimeCompiler
               using System.Collections.Generic;
               using System.IO;
               using System.Linq;
+              {{registeredUsings}}
 
               public static class __DynamicEval
               {
@@ -623,6 +663,24 @@ public static class RuntimeCompiler
                   }
               }
               """;
+
+        //var generatedSource =
+        //    $$"""
+        //      #nullable enable
+
+        //      using System;
+        //      using System.Collections.Generic;
+        //      using System.IO;
+        //      using System.Linq;
+
+        //      public static class __DynamicEval
+        //      {
+        //          public static object? Invoke()
+        //          {
+        //      {{Indent(body, 2)}}
+        //          }
+        //      }
+        //      """;
 
         var syntaxTree = CSharpSyntaxTree.ParseText(generatedSource, new CSharpParseOptions(LanguageVersion.Preview));
 
@@ -659,6 +717,109 @@ public static class RuntimeCompiler
         var invoke = method.CreateDelegate<Func<object?>>();
 
         return invoke();
+    }
+
+    public static object? Evaluate<TScope>(string source, Expression<Func<TScope>> scope)
+    {
+        if (scope.Body is not MemberExpression member)
+            throw new NotSupportedException("Eval scope must reference a captured variable.");
+
+        var name = member.Member.Name;
+        var value = scope.Compile()();
+        var scopeType = GetCSharpTypeName(typeof(TScope));
+
+        var assemblyName = $"DynamicRuntime.Eval.{Guid.NewGuid():N}";
+        var expression = SyntaxFactory.ParseExpression(source);
+        var isExpression = !expression.ContainsDiagnostics;
+
+
+        var body = isExpression
+            ? $"return {source};"
+            : $"{source}{Environment.NewLine}return null;";
+
+        //var body = isExpression ? $"return {source};" : source;
+
+        var registeredUsings = string.Join(
+            Environment.NewLine,
+            ActiveRuntime.Namespaces
+                .OrderBy(static value => value)
+                .Select(static value => $"using {value};"));
+
+        var generatedSource =
+            $$"""
+              #nullable enable
+
+              using System;
+              using System.Collections.Generic;
+              using System.IO;
+              using System.Linq;
+              {{registeredUsings}}
+
+              public static class __DynamicEval
+              {
+                  public static object? Invoke({{scopeType}} {{name}})
+                  {
+              {{Indent(body, 2)}}
+                  }
+              }
+              """;
+
+        //var generatedSource =
+        //    $$"""
+        //  #nullable enable
+
+        //  using System;
+        //  using System.Collections.Generic;
+        //  using System.IO;
+        //  using System.Linq;
+
+        //  public static class __DynamicEval
+        //  {
+        //      public static object? Invoke({{scopeType}} {{member.Member.Name}})
+        //      {
+        //  {{Indent(body, 2)}}
+        //      }
+        //  }
+        //  """;
+
+        var syntaxTree = CSharpSyntaxTree.ParseText(
+            generatedSource,
+            new CSharpParseOptions(LanguageVersion.Preview));
+
+        var compilation =
+            CSharpCompilation.Create(
+                assemblyName,
+                [syntaxTree],
+                GetMetadataReferences<TScope>(),
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    optimizationLevel: OptimizationLevel.Release,
+                    nullableContextOptions: NullableContextOptions.Enable,
+                    allowUnsafe: true));
+
+        using var pe = new MemoryStream();
+
+        var emit = compilation.Emit(pe);
+
+        if (!emit.Success)
+        {
+            throw CreateCompilationException(
+                source,
+                generatedSource,
+                emit.Diagnostics);
+        }
+
+        pe.Position = 0;
+
+        var assembly = AssemblyLoadContext.Default.LoadFromStream(pe);
+        var generatedType =
+            assembly.GetType("__DynamicEval", throwOnError: true)!;
+
+        var method = generatedType.GetMethod(
+            "Invoke",
+            BindingFlags.Public | BindingFlags.Static)!;
+
+        return method.Invoke(null, [value]);
     }
 
     private sealed record ParsedMembers(

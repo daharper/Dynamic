@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="resume.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Dynamic.Career\Dynamic.Career.csproj" />
     <ProjectReference Include="..\Dynamic.Runtime\Dynamic.Runtime.csproj" />
   </ItemGroup>

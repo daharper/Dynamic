@@ -10,4 +10,10 @@
     <ProjectReference Include="..\Dynamic.Runtime\Dynamic.Runtime.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resume.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
 </Project>
