@@ -9,7 +9,7 @@ namespace Dynamic.Runtime;
 /// resolved and invoked dynamically at runtime.
 /// </summary>
 /// <typeparam name="TSelf"> The concrete active object type.</typeparam>
-public abstract class ActiveObject<TSelf> : DynamicObject where TSelf : ActiveObject<TSelf>
+public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : ActiveObject<TSelf>
 {
     private ActiveObjectClass<TSelf> _objectClass = ActiveObjectClass<TSelf>.Empty;
 
@@ -38,6 +38,10 @@ public abstract class ActiveObject<TSelf> : DynamicObject where TSelf : ActiveOb
     private readonly Lock _slotGate = new();
 
     private readonly Dictionary<string, object?> _slots = new(StringComparer.Ordinal);
+
+    public ActiveObject(string name = "", TSelf? parent = null) : base(name, parent)
+    {
+    }
 
     protected TSelf Self => (TSelf)this;
 

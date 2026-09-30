@@ -37,7 +37,7 @@ static void ByCode()
     r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
 
     r.Skills.Technologies.With(
-        r.Skills.Languages.With(
+        r.Skills.Languages.Owns(
             r.Skills.CSharp,
             r.Skills.ObjectPascal),
         r.Skills.DotNet.With(
