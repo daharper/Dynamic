@@ -16,6 +16,7 @@ static void ByCode()
 {
     var r = ResumeFactory.Create();
 
+    // todo: improve the semantics
     Console.WriteLine($"{r.Roles.HeuLabs.Props["Rating"]}");
 
     r.Show();
