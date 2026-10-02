@@ -9,7 +9,8 @@ public static class ResumeFactory
     [
         new WorkPreferencesRegistrar(),
         new CompanyRegistrar(),
-        new HighlightsRegistrar()
+        new HighlightsRegistrar(),
+        new RoleRegistrar()
     ];
 
     public static Resume Create()

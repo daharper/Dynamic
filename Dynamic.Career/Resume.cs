@@ -7,11 +7,8 @@ public sealed class Resume : ActiveObject<Resume>
     public Resume()
     {
         Highlights.Factory = (Func<string, Highlight>)(n => new Highlight(Companies.GetOrAdd(new Company(n))));
+        Roles.Factory = (Func<string, Role>)(n => new Role(Companies.GetOrAdd(new Company(n))));
     }
-
-    //public string Name { get; set; } = "";
-
-    //public string Title { get; set; } = "";
 
     public string Email { get; set; } = "";
 
@@ -22,6 +19,8 @@ public sealed class Resume : ActiveObject<Resume>
     public Availability Availability { get; set; }
 
     public Money MinimumSalary { get; set; }
+
+    public dynamic Roles { get; } = new ActiveList<Role>(null, new RoleComparer());
 
     public dynamic Achievements { get; } = new ActiveList<Achievement>(n => new Achievement(n));
 
@@ -185,7 +184,13 @@ public sealed class Resume : ActiveObject<Resume>
                 }
             }
         }
+
+        Console.WriteLine("Roles:");
+
+        foreach (var r in Roles)
+        {
+            Console.WriteLine($"  • {r.StartYear} - {r.EndYear} {r.Company.Name} {r.Title}");
+            Console.WriteLine($"    {r.Description}");
+        }
     }
-
-
 }
