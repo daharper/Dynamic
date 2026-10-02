@@ -18,10 +18,6 @@ static void ByCode()
 
     Console.WriteLine($"{r.Roles.HeuLabs.Props["Rating"]}");
 
-    dynamic role = r.Roles.HeuLabs;
-
-    Console.WriteLine($"{role.Rating}");
-
     r.Show();
 }
 
