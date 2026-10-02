@@ -84,6 +84,8 @@ public abstract class ActiveManifest : DynamicObject
 
     public bool HasTag => Tags.Count > 0;
 
+    public bool HasLink => Links.Count > 0;
+
     public dynamic Let(string name, dynamic value)
     {
         Props[name] = value;

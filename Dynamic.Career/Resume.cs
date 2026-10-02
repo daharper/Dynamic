@@ -75,6 +75,28 @@ public sealed class Resume : ActiveObject<Resume>
             Console.WriteLine($"  • {d.Country} ({d.Options})");
         }
 
+        Console.WriteLine("Achievements:");
+
+        foreach (var a in Achievements)
+        {
+            Console.WriteLine($"  • {a.Name} ({a.Organisation})");
+        }
+
+        Console.WriteLine("Highlights:");
+
+        foreach (var h in Highlights)
+        {
+            Console.WriteLine($"  • {h.Company.Name}: {h.Description}");
+
+            if (h.HasLink)
+            {
+                foreach (var link in h.Links)
+                {
+                    Console.WriteLine($"    - {link.Title} ({link.Url})");
+                }
+            }
+        }
+
         Console.WriteLine("Companies:");
 
         foreach (var c in Companies)
@@ -94,20 +116,6 @@ public sealed class Resume : ActiveObject<Resume>
             }
 
             Console.WriteLine();
-        }
-
-        Console.WriteLine("Achievements:");
-
-        foreach (var a in Achievements)
-        {
-            Console.WriteLine($"  • {a.Name} ({a.Organisation})");
-        }
-
-        Console.WriteLine("Highlights:");
-
-        foreach (var h in Highlights)
-        {
-            Console.WriteLine($"  • {h.Company.Name}: {h.Description}");
         }
 
         Console.WriteLine();
