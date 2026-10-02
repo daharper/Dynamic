@@ -19,17 +19,31 @@ public enum Relationship
     UsedBy
 }
 
+public sealed record Link(string Title, string Url);
+
 public sealed record Association(ActiveManifest Manifest, Relationship Relationship);
 
 public abstract class ActiveManifest : DynamicObject
 {
+    private string _title = "";
+
     protected ActiveManifest(string name = "") => Name = name;
 
     public string Name { get; set; }
 
+    public string Title
+    {
+        get => string.IsNullOrWhiteSpace(_title) ? Name : _title;
+        set => _title = value;
+    }
+
+    public string Description { get; set; } = "";
+
     public List<string> Aliases { get; } = [];
 
     public List<Association> Associations { get; } = [];
+
+    public List<Link> Links { get; } = [];
 
     public Dictionary<string, dynamic> Props { get; } = [];
 
@@ -64,7 +78,7 @@ public abstract class ActiveManifest : DynamicObject
 
     public bool HasAlias => Aliases.Count > 0;
 
-    public bool HasProperty => Props.Count > 0;
+    public bool HasProp => Props.Count > 0;
 
     public bool HasNote => Notes.Count > 0;
 
@@ -118,6 +132,12 @@ public abstract class ActiveManifest : DynamicObject
     {
         tag = tag.Trim().ToLowerInvariant();
         return Tags.Contains(tag);
+    }
+
+    public dynamic Link(string title, string url)
+    {
+        Links.Add(new Link(title, url));
+        return this;
     }
 
     public dynamic Tag(params string[] tags)

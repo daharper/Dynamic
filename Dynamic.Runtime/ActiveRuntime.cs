@@ -10,6 +10,8 @@ public static class ActiveRuntime
     public static IEnumerable<string> Namespaces => RegisteredNamespaces;
     public static IEnumerable<Assembly> Assemblies => RegisteredAssemblies;
 
+    public static bool AutoProperties { get; set; } = true;
+
     public static void Register(params Type[] types)
     {
         foreach (var type in types)

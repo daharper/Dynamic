@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Dynamic/Dynamic.csproj" />
+  <Project Path="Dynamic.Application/Dynamic.Application.csproj" Id="83356b17-28f3-4408-b1ae-c985448f0ee9" />
   <Project Path="Dynamic.Career/Dynamic.Career.csproj" Id="d9d8ed82-ad89-40ed-9260-0a5f73827e6d" />
   <Project Path="Dynamic.Runtime/Dynamic.Runtime.csproj" />
   <Project Path="Dynamic.Tests/Dynamic.Tests.csproj" Id="05d5edcc-bd74-4b1d-9a86-b5f95fb68b82" />

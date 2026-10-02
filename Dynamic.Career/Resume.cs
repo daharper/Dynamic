@@ -9,8 +9,14 @@ public sealed class Resume : ActiveObject<Resume>
         Highlights.Factory = (Func<string, Highlight>)(n => new Highlight(Companies.GetOrAdd(new Company(n))));
     }
 
-    public string Name { get; set; } = "";
-    
+    //public string Name { get; set; } = "";
+
+    //public string Title { get; set; } = "";
+
+    public string Email { get; set; } = "";
+
+    public string LinkedIn { get; set; } = "";
+
     public string Location { get; set; } = "";
     
     public Availability Availability { get; set; }
@@ -44,7 +50,10 @@ public sealed class Resume : ActiveObject<Resume>
     {
         var output = $"""
                       Name: {Name}
-                      Option: {Location}
+                      Title: {Title}
+                      Email: {Email}
+                      LinkedIn: {LinkedIn}
+                      Location: {Location}
                       Availability: {Availability}
                       Minimum Salary: {MinimumSalary}
                       
@@ -70,7 +79,21 @@ public sealed class Resume : ActiveObject<Resume>
 
         foreach (var c in Companies)
         {
-            Console.WriteLine($"  • {c.Name}, {c.Description} ({c.Scale})");
+            Console.WriteLine($"{c.Title} ({c.Scale})");
+            Console.WriteLine(c.Description);
+            Console.WriteLine();
+
+            if (c.HasNote)
+            {
+                Console.WriteLine("[notes]");
+
+                foreach (var note in c.Notes)
+                {
+                    Console.WriteLine(note);
+                }
+            }
+
+            Console.WriteLine();
         }
 
         Console.WriteLine("Achievements:");
@@ -86,6 +109,8 @@ public sealed class Resume : ActiveObject<Resume>
         {
             Console.WriteLine($"  • {h.Company.Name}: {h.Description}");
         }
+
+        Console.WriteLine();
 
         Console.WriteLine("Skills:");
 
@@ -132,7 +157,7 @@ public sealed class Resume : ActiveObject<Resume>
                 }
             }
 
-            if (s.HasProperty)
+            if (s.HasProp)
             {
                 Console.WriteLine("        [properties]");
 

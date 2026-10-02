@@ -1,6 +1,17 @@
-﻿using System.Text;
+﻿using Dynamic.Career;
 using Dynamic.Runtime;
-using Dynamic.Career;
+using Microsoft.CodeAnalysis;
+using Microsoft.VisualBasic;
+using System.ComponentModel.Design;
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Timers;
+using Dynamic.Application;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -13,84 +24,33 @@ return;
 
 static void ByCode()
 {
-    var r = new Resume
-    {
-        Name = "David Harper",
-        Location = "Spennymoor, County Durham, United Kingdom",
-        Availability = Availability.Immediately,
-        MinimumSalary = new Money(50_000m, "GBP")
-    };
+    var r = ResumeFactory.Create();
 
-    r.Eligible.Australia.Options = Option.Remote | Option.AnyOnRelocation;
-    r.Eligible.Ireland.Options = Option.Remote;
-    r.Eligible.UnitedKingdom.Options = Option.Remote;
-    r.Eligible.NorthEastUnitedKingdom.Options = Option.Remote | Option.Hybrid;
+    //r.Achievements.Mvp("Embarcadero");
 
-    r.Desirable.Singapore.Options = Option.Remote | Option.AnyOnRelocation;
-    r.Desirable.USA.Options = Option.Remote | Option.AnyOnRelocation;
+    //var skills = r.Skills;
+    //var technologies = skills.Technologies;
+    //var languages = skills.Languages;
 
-    r.Achievements.Mvp("Embarcadero");
+    //var delphi = skills.Delphi
+    //    .Let("Versions", new List<string> { "1", "2", "3", "4", "5", "6", "7", "10", "XE", "11", "12", "13" })
+    //    .Note("First used Delphi in 1998")
+    //    .Includes(skills.ObjectPascal, skills.RTL, skills.VCL);
 
-    r.Companies.HeuLabs("HeuLabs was a fast-growing, award-winning, innovative Singaporean EdTech startup", CompanyScale.Startup);
-    r.Companies.STEngineering("Global technology engineering group with customers in over 100 countries.", CompanyScale.Enterprise);
+    //var dotNet = skills.DotNet
+    //    .Alias(".NET")
+    //    .Includes(skills.CSharp, skills.DotNetCore.Alias(".NET Core"));
 
-    r.Highlights.HeuLabs.Description = "Presented HeuCampus live at the Microsoft Singapore launch event for Visual Studio 2005";
+    //skills.CSharp
+    //    .Alias("C#")
+    //    .Let("Versions", Enumerable.Range(1, 15).Select(i => i.ToString()).ToList())
+    //    .Note("First used C# in 2001 whilst in beta");
 
-    var skills = r.Skills;
-    var technologies = skills.Technologies;
-    var languages = skills.Languages;
+    //skills.ObjectPascal.Alias("OP");
 
-    var delphi = skills.Delphi
-        .Let("Versions", new List<string>
-        {
-            "1", "2", "3", "4", "5", "6", "7",
-            "10", "XE", "11", "12", "13"
-        })
-        .Note("First used Delphi in 1998")
-        .Includes(
-            skills.ObjectPascal,
-            skills.RTL,
-            skills.VCL);
+    //languages.Generalizes(skills.CSharp, skills.ObjectPascal);
 
-    var dotNet = skills.DotNet
-        .Alias(".NET")
-        .Includes(
-            skills.CSharp,
-            skills.DotNetCore.Alias(".NET Core"));
-
-    skills.CSharp
-        .Alias("C#")
-        .Let("Versions", Enumerable.Range(1, 15)
-            .Select(i => i.ToString())
-            .ToList())
-        .Note("First used C# in 2001 whilst in beta");
-
-    skills.ObjectPascal.Alias("OP");
-
-    languages.Generalizes(skills.CSharp, skills.ObjectPascal);
-
-    technologies.Includes(languages, skills.CSharp, skills.ObjectPascal, dotNet, delphi);
-
-    //technologies
-    //    .Includes(
-    //        languages
-    //            .Generalizes(
-    //                skills.CSharp
-    //                    .Alias("C#")
-    //                    .Let("Versions", Enumerable.Range(1, 15).Select(i => i.ToString()).ToList())
-    //                    .Note("First used C# in 2001 whilst in beta"),
-    //                skills.ObjectPascal
-    //                    .Alias("OP")
-    //        ),
-    //        skills.DotNet.Alias(".NET")
-    //            .Includes(
-    //                skills.CSharp,
-    //                skills.DotNetCore.Alias(".NET Core")),
-    //                skills.Delphi
-    //                    .Let("Versions", new List<string> { "1", "2", "3", "4", "5", "6", "7", "10", "XE", "11", "12", "13" })
-    //                    .Note("First used C# in 1998")
-    //                    .Includes(skills.ObjectPascal, skills.RTL, skills.VCL)
-    //);
+    //technologies.Includes(languages, skills.CSharp, skills.ObjectPascal, dotNet, delphi);
 
     r.Show();
 }

@@ -324,4 +324,20 @@ public sealed class EvalTests : RuntimeTestBase
 
         Assert.True(predicate(bob));
     }
+
+    [Fact]
+    public void Runtime_method_takes_precedence_over_clr_method()
+    {
+        dynamic alice = NewPerson("Alice");
+
+        alice.ClassEval("""
+                        public string ToString()
+                        {
+                            return "Runtime";
+                        }
+                        """);
+
+        Assert.Equal("Runtime", (string)alice.Send("ToString"));
+    }
+
 }

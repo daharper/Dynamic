@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
@@ -117,7 +118,7 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
 
     internal bool TryDispatchMessage(RuntimeMessage message, out object? result)
     {
-        return TryInvokeRuntimeMember(message, out result) || 
+        return TryInvokeRuntimeMember(message, out result) ||
                TryInvokeClrMember(message, out result);
     }
 
@@ -144,8 +145,12 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
     public override bool TryInvokeMember(InvokeMemberBinder binder, object?[]? args, out object? result)
     {
         var message = new RuntimeMessage(binder.Name, args ?? []);
-        return TryInvokeRuntimeMember(message, out result);
+
+        if (TryDispatchMessage(message, out result)) return true;
+
+        return TryInvokeAutoProperty(message, out result);
     }
+
 
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
@@ -310,6 +315,21 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
 
         result = null;
         return false;
+    }
+
+    private bool TryInvokeAutoProperty(RuntimeMessage message, out object? result)
+    {
+        result = null;
+
+        if (message.Arguments.Length != 1) return false;
+
+        if (!ActiveRuntime.AutoProperties) 
+            throw new InvalidOperationException($"Auto-properties are disabled: {message.Name}");
+
+        Props[message.Name] = message.Arguments[0]!;
+
+        result = Self;
+        return true;
     }
 
     public object? Send(string name, params object?[]? args)
