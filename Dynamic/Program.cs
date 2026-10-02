@@ -7,8 +7,8 @@ Console.OutputEncoding = Encoding.UTF8;
 
 ActiveRuntime.Register(typeof(Resume));
 
-ByCode();
-//ByScript();
+// ByCode();
+ByScript();
 
 return;
 
