@@ -31,6 +31,29 @@ public class ActiveRuntimeTests : RuntimeTestBase
         Assert.Same(bob, result);
     }
 
+
+    [Fact]
+    public void Unknown_Member_Invocation_For_Known_Property()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        var result = bob.FirstName("Bobby");
+
+        Assert.Equal("Bobby", bob.FirstName);
+        Assert.Same(bob, result);
+    }
+
+    [Fact]
+    public void Known_inherited_property_can_be_invoked_fluently()
+    {
+        dynamic bob = NewPerson("Bob");
+
+        var result = bob.Description("Hello");
+
+        Assert.Equal("Hello", bob.Description);
+        Assert.Same(bob, result);
+    }
+
     [Fact]
     public void Auto_Property_Throws_When_Disabled()
     {

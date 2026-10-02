@@ -29,11 +29,6 @@ public sealed record Achievement(string Name, string Organisation = "")
     public string Organisation { get; set; } = Organisation;
 }
 
-public sealed record Highlight(Company Company, string Description = "")
-{
-    public string Description { get; set; } = Description;
-}
-
 public sealed record Preference(string Country, Option Options = Option.Remote)
 {
     public Option Options { get; set; } = Options;

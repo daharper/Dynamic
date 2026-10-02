@@ -116,6 +116,13 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
         }
     }
 
+    public override DynamicMetaObject GetMetaObject(Expression parameter)
+    {
+        var metaObject = base.GetMetaObject(parameter);
+        return new ActiveMetaObject(parameter, this, metaObject);
+    }
+
+
     internal bool TryDispatchMessage(RuntimeMessage message, out object? result)
     {
         return TryInvokeRuntimeMember(message, out result) ||
