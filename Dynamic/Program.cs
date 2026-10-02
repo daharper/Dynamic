@@ -1,17 +1,7 @@
 ﻿using Dynamic.Career;
 using Dynamic.Runtime;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualBasic;
-using System.ComponentModel.Design;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using System.Timers;
 using Dynamic.Application;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -26,7 +16,7 @@ static void ByCode()
 {
     var r = ResumeFactory.Create();
 
-    //r.Achievements.Mvp("Embarcadero");
+    r.Achievements.Mvp("Embarcadero");
 
     //var skills = r.Skills;
     //var technologies = skills.Technologies;

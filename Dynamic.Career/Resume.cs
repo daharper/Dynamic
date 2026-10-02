@@ -25,9 +25,9 @@ public sealed class Resume : ActiveObject<Resume>
 
     public dynamic Achievements { get; } = new ActiveList<Achievement>(n => new Achievement(n));
 
-    public dynamic Eligible { get; } = new ActiveList<Preference>(n => new Preference(n));
+    public dynamic Eligible { get; } = new ActiveList<WorkPreference>(n => new WorkPreference(n));
 
-    public dynamic Desirable { get; } = new ActiveList<Preference>(n => new Preference(n));
+    public dynamic Desirable { get; } = new ActiveList<WorkPreference>(n => new WorkPreference(n));
 
     public dynamic Companies { get; } = new ActiveList<Company>(n => new Company(n), new CompanyComparer());
 

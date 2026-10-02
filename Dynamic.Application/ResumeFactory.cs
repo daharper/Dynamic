@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dynamic.Application.Registrar;
+﻿using Dynamic.Application.Registrar;
 using Dynamic.Career;
 
 namespace Dynamic.Application;
