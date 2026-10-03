@@ -10,15 +10,10 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_adds_method_to_one_instance_only()
     {
-        dynamic alice = NewPerson("Alice");
-        dynamic bob = NewPerson("Bob");
+        var alice = NewPerson("Alice");
+        var bob = NewPerson("Bob");
 
-        alice.Eval("""
-            public string Secret()
-            {
-                return FirstName + " only";
-            }
-            """);
+        alice.Eval("""public string Secret() => FirstName + " only";""");
 
         Assert.Equal("Alice only", (string)alice.Secret());
 
@@ -28,27 +23,17 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Instance_member_takes_precedence_over_class_member()
     {
-        dynamic alice = NewPerson("Alice");
-        dynamic bob = NewPerson("Bob");
+        var alice = NewPerson("Alice");
+        var bob = NewPerson("Bob");
 
-        alice.ClassEval("""
-                        public string Label()
-                        {
-                            return "class";
-                        }
-                        """);
+        alice.ClassEval("""public string Label() => "class";""");
 
         // First prove that the class member exists
         // before we install an instance override.
         Assert.Equal("class", (string)alice.Label());
         Assert.Equal("class", (string)bob.Label());
 
-        alice.Eval("""
-                   public string Label()
-                   {
-                       return "instance";
-                   }
-                   """);
+        alice.Eval("""public string Label() => "instance";""");
 
         // Alice should now hit the instance overlay.
         Assert.Equal("instance", (string)alice.Label());
@@ -60,8 +45,8 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_auto_property_state_is_object_specific()
     {
-        dynamic alice = NewPerson("Alice");
-        dynamic bob = NewPerson("Bob");
+        var alice = NewPerson("Alice");
+        var bob = NewPerson("Bob");
 
         alice.Eval("public string PrivateNickname { get; set; }");
 
@@ -78,7 +63,7 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Frozen_object_does_not_create_missing_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.Freeze = FreezeMode.Partial;
 
@@ -89,7 +74,7 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Freeze_modes_control_runtime_property_mutation()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
         alice.Nickname = "Al";
 
@@ -127,8 +112,7 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Run_of_T_evaluates_statement_block()
     {
-        var result = 
-            Eval.Run<int>(
+        var result = Eval.Run<int>(
                 """
                 var x = 10;
                 var y = 20;
@@ -142,8 +126,7 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Run_supports_normal_CSharp_code()
     {
-        var result =
-            Eval.Run<string>(
+        var result = Eval.Run<string>(
                 """
                 var values =
                     new List<int>
@@ -165,26 +148,26 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Fully_frozen_object_rejects_eval()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
         alice.Freeze = FreezeMode.Fully;
 
-        Assert.Throws<InvalidOperationException>(
-            () =>
+        Assert.Throws<InvalidOperationException>(() =>
             {
-                alice.Eval("""
-                           public string Secret()
-                           {
-                               return "Secret";
-                           }
-                           """);
+                alice.Eval(
+                    """
+                    public string Secret()
+                    {
+                        return "Secret";
+                    }
+                    """);
             });
     }
 
     [Fact]
     public void Fully_frozen_object_cannot_write_active_class_property()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
         alice.ClassEval("public string Nickname { get; set; }");
 
@@ -202,16 +185,17 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Partially_frozen_object_allows_eval()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
         alice.Freeze = FreezeMode.Partial;
 
-        alice.Eval("""
-                   public string Secret()
-                   {
-                       return "Secret";
-                   }
-                   """);
+        alice.Eval(
+            """
+            public string Secret()
+            {
+                return "Secret";
+            }
+            """);
 
         Assert.Equal("Secret", (string)alice.Secret());
     }
@@ -219,14 +203,9 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_can_define_and_invoke_generic_method()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.Eval("""
-                 public T Echo<T>(T value)
-                 {
-                     return value;
-                 }
-                 """);
+        bob.Eval("public T Echo<T>(T value) => value;");
 
         string result = bob.Echo("Hello");
 
@@ -236,16 +215,13 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_can_infer_generic_arguments_from_generic_interfaces()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.Eval("""
-                 public IEnumerable<(T, V)> GetPairs<T, V>(
-                     IEnumerable<T> keys,
-                     IEnumerable<V> values)
-                 {
-                     return keys.Zip(values, (k, v) => (k, v));
-                 }
-                 """);
+        bob.Eval(
+            """
+            public IEnumerable<(T, V)> GetPairs<T, V>(IEnumerable<T> keys, IEnumerable<V> values)
+                => keys.Zip(values, (k, v) => (k, v));
+            """);
 
         var keys = new[] { "A", "B", "C" };
         var values = new[] { 1, 2, 3 };
@@ -258,16 +234,11 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_can_infer_generic_argument_from_constructed_generic_type()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.Eval("""
-                 public T Create<T>(Func<T> factory)
-                 {
-                     return factory();
-                 }
-                 """);
+        bob.Eval("public T Create<T>(Func<T> factory) => factory();");
 
-        Func<string> factory = () => "Hello";
+        var factory = () => "Hello";
 
         string result = bob.Create(factory);
 
@@ -277,14 +248,9 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Eval_rejects_conflicting_generic_argument_inferences()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.Eval("""
-                 public T Choose<T>(T first, T second)
-                 {
-                     return first;
-                 }
-                 """);
+        bob.Eval("public T Choose<T>(T first, T second) => first;");
 
         var exception = Assert.Throws<InvalidOperationException>(() => bob.Choose("A", 42));
 
@@ -296,16 +262,11 @@ public sealed class EvalTests : RuntimeTestBase
     {
         ActiveRuntime.Register(typeof(Person));
 
-        dynamic bob = new Person
-        {
-            FirstName = "Bob"
-        };
+        dynamic bob = new Person { FirstName = "Bob" };
 
         bob.Eval("""
                  public Expression<Func<Person, bool>> FirstNameIs(string name)
-                 {
-                     return person => person.FirstName == name;
-                 }
+                    => person => person.FirstName == name;
                  """);
 
         Expression<Func<Person, bool>> specification = bob.FirstNameIs("Bob");
@@ -320,14 +281,9 @@ public sealed class EvalTests : RuntimeTestBase
     [Fact]
     public void Runtime_method_takes_precedence_over_clr_method()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string ToString()
-                        {
-                            return "Runtime";
-                        }
-                        """);
+        alice.ClassEval("""public string ToString() => "Runtime";""");
 
         Assert.Equal("Runtime", (string)alice.Send("ToString"));
     }

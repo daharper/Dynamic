@@ -8,13 +8,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
         var alice = NewPerson("Alice");
         var bob = NewPerson("Bob");
 
-        bob.ClassEval(
-            """
-            public string DisplayName()
-            {
-                return FirstName;
-            }
-            """);
+        bob.ClassEval("public string DisplayName() => FirstName;");
 
         Assert.Equal("Alice", (string)alice.DisplayName());
         Assert.Equal("Bob", (string)bob.DisplayName());
@@ -25,19 +19,13 @@ public sealed class ClassEvalTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval(
-            """
-            public string FirstVersion()
-            {
-                return FirstName;
-            }
-            """);
+        alice.ClassEval("public string FirstVersion() => FirstName;");
 
         Assert.Equal("Alice", (string)alice.FirstVersion());
 
         var bob = NewPerson("Bob");
 
-        bob.ClassEval("public string SecondVersion() => FirstName + \"!\";");
+        bob.ClassEval("""public string SecondVersion() => FirstName + "!";""");
 
         Assert.Equal("Alice!", (string)alice.SecondVersion());
         Assert.Equal("Bob!", (string)bob.SecondVersion());
@@ -48,16 +36,10 @@ public sealed class ClassEvalTests : RuntimeTestBase
     {
         var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string DisplayName()
-            {
-                return FirstName;
-            }
-
-            public string Greeting()
-            {
-                return "Hello " + DisplayName();
-            }
+        bob.ClassEval(
+            """
+            public string DisplayName() => FirstName;
+            public string Greeting() => "Hello " + DisplayName(); 
             """);
 
         Assert.Equal("Hello Bob", (string)bob.Greeting());
@@ -87,11 +69,10 @@ public sealed class ClassEvalTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string DisplayName()
-            {
-                return Nickname + " (" + FirstName + ")";
-            }
+                => Nickname + " (" + FirstName + ")";
             """);
 
         Assert.Equal("Robert (Bob)", (string)bob.DisplayName());
@@ -106,7 +87,8 @@ public sealed class ClassEvalTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string AddBang()
             {
                 Nickname += "!";

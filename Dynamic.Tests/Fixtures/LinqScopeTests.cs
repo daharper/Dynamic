@@ -5,15 +5,14 @@ public sealed class LinqScopeTests : RuntimeTestBase
     [Fact]
     public void Linq_from_range_variable_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LinqFromShadow()
             {
                 var query =
@@ -24,23 +23,20 @@ public sealed class LinqScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "ONE, TWO",
-            (string)bob.LinqFromShadow());
+        Assert.Equal("ONE, TWO", (string)bob.LinqFromShadow());
     }
 
     [Fact]
     public void Linq_let_range_variable_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LinqLetShadow()
             {
                 var query =
@@ -52,23 +48,20 @@ public sealed class LinqScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "ABC",
-            (string)bob.LinqLetShadow());
+        Assert.Equal("ABC", (string)bob.LinqLetShadow());
     }
 
     [Fact]
     public void Linq_query_continuation_has_its_own_range_variable()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LinqContinuation()
             {
                 var query =
@@ -81,8 +74,6 @@ public sealed class LinqScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "AB",
-            (string)bob.LinqContinuation());
+        Assert.Equal("AB", (string)bob.LinqContinuation());
     }
 }

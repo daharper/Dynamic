@@ -12,19 +12,12 @@ public abstract class RuntimeTestBase
     }
 
     protected static dynamic NewPerson(string firstName)
-        => new Person
-        {
-            FirstName = firstName
-        };
+        => new Person { FirstName = firstName };
 
     private static void ResetPersonRuntime()
     {
-        var field =
-            typeof(ActiveClassRegistry<Person>)
-                .GetField(
-                    "_current",
-                    BindingFlags.Static |
-                    BindingFlags.NonPublic);
+        var field = typeof(ActiveClassRegistry<Person>)
+                .GetField("_current", BindingFlags.Static | BindingFlags.NonPublic);
 
         if (field is null)
         {
@@ -33,8 +26,6 @@ public abstract class RuntimeTestBase
                 "If the registry implementation changes, update the test reset helper.");
         }
 
-        field.SetValue(
-            null,
-            ActiveClass<Person>.Empty);
+        field.SetValue(null, ActiveClass<Person>.Empty);
     }
 }

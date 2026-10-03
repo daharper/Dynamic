@@ -11,19 +11,8 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string DisplayName()
-                        {
-                            return FirstName;
-                        }
-                        """);
-
-        alice.Eval("""
-                   public string SecretName()
-                   {
-                       return "Secret";
-                   }
-                   """);
+        alice.ClassEval("public string DisplayName() => FirstName;");
+        alice.Eval("""public string SecretName() => "Secret";""");
 
         var objectMethods = ((Person)alice).ObjectMethods();
         var classMethods = ((Person)alice).ClassMethods();
@@ -45,12 +34,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string DisplayName()
-                        {
-                            return FirstName;
-                        }
-                        """);
+        alice.ClassEval("public string DisplayName() => FirstName;");
 
         var result = alice.Send("DisplayName");
 
@@ -62,14 +46,13 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string Join(
-                            string left,
-                            string right)
-                        {
-                            return $"{left}:{right}";
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public string Join(string left, string right)
+            {
+                return $"{left}:{right}";
+            }
+            """);
 
         var result = alice.Send("Join", "A", "B");
 
@@ -91,19 +74,9 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string Greeting()
-                        {
-                            return "Class";
-                        }
-                        """);
+        alice.ClassEval("""public string Greeting() => "Class";""");
 
-        alice.Eval("""
-                   public string Greeting()
-                   {
-                       return "Singleton";
-                   }
-                   """);
+        alice.Eval("""public string Greeting() => "Singleton";""");
 
         Assert.Equal("Singleton", (string)alice.Send("Greeting"));
 
@@ -117,12 +90,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string DisplayName()
-                        {
-                            return FirstName;
-                        }
-                        """);
+        alice.ClassEval("public string DisplayName() => FirstName;");
 
         var result = alice.Send<string>("DisplayName");
 
@@ -134,14 +102,11 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public int Add(
-                            int left,
-                            int right)
-                        {
-                            return left + right;
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public int Add(int left, int right)
+                => left + right;
+            """);
 
         var result = alice.Send<int>("Add", 10, 20);
 
@@ -153,12 +118,11 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public int Add(int left, int right)
-                        {
-                            return left + right;
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public int Add(int left, int right)
+                => left + right;
+            """);
 
         Assert.Equal(30, (int)alice.Send("Add(10, 20)"));
     }
@@ -168,12 +132,11 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public int Add(int left, int right)
-                        {
-                            return left + right;
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public int Add(int left, int right)
+                => left + right;
+            """);
 
         Assert.Equal(42, (int)alice.Send("Add 30 12"));
     }
@@ -183,12 +146,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string Say(string value)
-                        {
-                            return value;
-                        }
-                        """);
+        alice.ClassEval("public string Say(string value) => value;");
 
         Assert.Equal("Hello World", (string)alice.Send("""Say "Hello World" """));
     }
@@ -198,14 +156,11 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string Join(
-                            string left,
-                            string right)
-                        {
-                            return $"{left}:{right}";
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public string Join(string left, string right)
+                => $"{left}:{right}";
+            """);
 
         Assert.Equal("A:B", (string)alice.Send("Join", "A", "B"));
     }
@@ -215,12 +170,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         dynamic item = new DefaultMissingObject();
 
-        var exception =
-            Assert.Throws<MissingMethodException>(
-                () =>
-                {
-                    item.Send("DoesNotExist");
-                });
+        var exception = Assert.Throws<MissingMethodException>(() => { item.Send("DoesNotExist"); });
 
         Assert.Equal("Method 'DoesNotExist' was not found on 'DefaultMissingObject'.", exception.Message);
     }
@@ -230,19 +180,9 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string ToString()
-                        {
-                            return "Class";
-                        }
-                        """);
+        alice.ClassEval("""public string ToString() => "Class";""");
 
-        alice.Eval("""
-                   public string ToString()
-                   {
-                       return "Object";
-                   }
-                   """);
+        alice.Eval("""public string ToString() => "Object";""");
 
         var result = alice.Send("ToString");
 
@@ -254,12 +194,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string ToString()
-                        {
-                            return "Class";
-                        }
-                        """);
+        alice.ClassEval("""public string ToString() => "Class";""");
 
         var result = alice.Send("ToString");
 
@@ -312,19 +247,9 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string DisplayName()
-                        {
-                            return FirstName;
-                        }
-                        """);
+        alice.ClassEval("public string DisplayName() => FirstName;");
 
-        alice.Eval("""
-                   public string SecretName()
-                   {
-                       return "Secret";
-                   }
-                   """);
+        alice.Eval("""public string SecretName() => "Secret";""");
 
         Assert.True(alice.HasMethod("SecretName"));
         Assert.True(alice.HasMethod("DisplayName"));
@@ -337,12 +262,7 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        var exception = 
-            Assert.Throws<AmbiguousMatchException>(
-                () =>
-                {
-                    alice.Send("Choose", 10, 20);
-                });
+        var exception = Assert.Throws<AmbiguousMatchException>(() => { alice.Send("Choose", 10, 20); });
 
         Assert.Contains("Choose", exception.Message);
     }
@@ -471,15 +391,16 @@ public sealed class InspectionTests : RuntimeTestBase
 
         alice.ClassEval("public string Nickname { get; set; }");
 
-        alice.Eval("""
-                   public string SecretName
-                   {
-                       get
-                       {
-                           return "Secret";
-                       }
-                   }
-                   """);
+        alice.Eval(
+           """
+           public string SecretName
+           {
+               get
+               {
+                   return "Secret";
+               }
+           }
+           """);
 
         Assert.True(alice.HasProperty("SecretName"));
         Assert.True(alice.HasProperty("Nickname"));
@@ -496,15 +417,16 @@ public sealed class InspectionTests : RuntimeTestBase
 
         alice.Nickname = "Class value";
 
-        alice.Eval("""
-                   public string Nickname
-                   {
-                       get
-                       {
-                           return "Object value";
-                       }
-                   }
-                   """);
+        alice.Eval(
+            """
+            public string Nickname
+            {
+               get
+               {
+                   return "Object value";
+               }
+            }
+            """);
 
         Assert.Equal("Object value", (string)alice.Nickname);
         Assert.Throws<RuntimeBinderException>(() => { alice.Nickname = "Should fail"; });
@@ -515,15 +437,16 @@ public sealed class InspectionTests : RuntimeTestBase
     {
         var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
-                        public string DisplayName
-                        {
-                            get
-                            {
-                                return FirstName;
-                            }
-                        }
-                        """);
+        alice.ClassEval(
+            """
+            public string DisplayName
+            {
+                get
+                {
+                    return FirstName;
+                }
+            }
+            """);
 
         Assert.Throws<RuntimeBinderException>(() => { alice.DisplayName = "Bob"; });
         Assert.DoesNotContain("DisplayName", ((Person)alice).ObjectProperties());

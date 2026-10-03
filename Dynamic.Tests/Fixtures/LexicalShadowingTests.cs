@@ -14,9 +14,7 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
         bob.ClassEval(
             """
             public string Echo(string Nickname, string FirstName)
-            {
-                return Nickname + " / " + FirstName;
-            }
+                => Nickname + " / " + FirstName;
             """
         );
 
@@ -32,7 +30,8 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LocalShadow()
             {
                 string Nickname = "Local Nick";

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 namespace Dynamic.Tests.Fixtures;
 
 public sealed class DeclarationScopeTests : RuntimeTestBase
@@ -17,7 +11,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
 
         bob.Nickname = 99;
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public int OutVarShadow()
             {
                 int.TryParse("42", out var Nickname);
@@ -37,7 +32,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string ForeachShadow()
             {
                 foreach (var Nickname in new[] { "A", "B" })
@@ -61,7 +57,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string DeconstructionShadow()
             {
                 var (Nickname, value) = ("Local Nick", 1);
@@ -77,7 +74,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
     {
         var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string ForPattern()
             {
                 object value = "For Nick";
@@ -99,7 +97,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
     {
         var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string WhilePattern()
             {
                 object value = "While Nick";
@@ -125,7 +124,8 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public bool DoPattern()
             {
                 object value = "Do Nick";
