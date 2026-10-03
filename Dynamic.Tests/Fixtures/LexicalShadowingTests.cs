@@ -5,36 +5,30 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
     [Fact]
     public void Parameter_shadows_runtime_property_and_CLR_member()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string Echo(string Nickname, string FirstName)
             {
                 return Nickname + " / " + FirstName;
             }
-            """);
+            """
+        );
 
-        Assert.Equal(
-            "Parameter Nick / Parameter First",
-            (string)bob.Echo(
-                "Parameter Nick",
-                "Parameter First"));
+        Assert.Equal("Parameter Nick / Parameter First", (string)bob.Echo("Parameter Nick", "Parameter First"));
     }
 
     [Fact]
     public void Local_variable_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
@@ -52,20 +46,17 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
     [Fact]
     public void Lambda_parameter_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LambdaShadow()
             {
-                Func<string, string> f =
-                    Nickname => Nickname.ToUpperInvariant();
-
+                Func<string, string> f = Nickname => Nickname.ToUpperInvariant();
                 return f("lambda");
             }
             """);
@@ -76,15 +67,14 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
     [Fact]
     public void Local_function_parameter_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string LocalFunctionShadow()
             {
                 string Inner(string Nickname)
@@ -96,17 +86,16 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "Local Function Nick",
-            (string)bob.LocalFunctionShadow());
+        Assert.Equal("Local Function Nick", (string)bob.LocalFunctionShadow());
     }
 
     [Fact]
     public void Anonymous_method_parameter_shadows_CLR_member()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string AnonymousShadow()
             {
                 Func<string, string> f =
@@ -119,21 +108,18 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "Anonymous First",
-            (string)bob.AnonymousShadow());
+        Assert.Equal("Anonymous First", (string)bob.AnonymousShadow());
     }
 
     [Fact]
     public void Catch_variable_can_shadow_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string CatchShadow()
             {
                 try
@@ -147,8 +133,6 @@ public sealed class LexicalShadowingTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "Caught Runtime",
-            (string)bob.CatchShadow());
+        Assert.Equal("Caught Runtime", (string)bob.CatchShadow());
     }
 }

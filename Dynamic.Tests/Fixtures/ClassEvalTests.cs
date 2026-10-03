@@ -5,10 +5,11 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void ClassEval_method_can_read_CLR_instance_state()
     {
-        dynamic alice = NewPerson("Alice");
-        dynamic bob = NewPerson("Bob");
+        var alice = NewPerson("Alice");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string DisplayName()
             {
                 return FirstName;
@@ -22,9 +23,10 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Existing_instances_see_later_class_changes()
     {
-        dynamic alice = NewPerson("Alice");
+        var alice = NewPerson("Alice");
 
-        alice.ClassEval("""
+        alice.ClassEval(
+            """
             public string FirstVersion()
             {
                 return FirstName;
@@ -33,14 +35,9 @@ public sealed class ClassEvalTests : RuntimeTestBase
 
         Assert.Equal("Alice", (string)alice.FirstVersion());
 
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string SecondVersion()
-            {
-                return FirstName + "!";
-            }
-            """);
+        bob.ClassEval("public string SecondVersion() => FirstName + \"!\";");
 
         Assert.Equal("Alice!", (string)alice.SecondVersion());
         Assert.Equal("Bob!", (string)bob.SecondVersion());
@@ -49,7 +46,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Runtime_method_can_call_runtime_method_from_same_patch()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.ClassEval("""
             public string DisplayName()
@@ -69,12 +66,10 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Runtime_auto_property_has_per_object_state()
     {
-        dynamic alice = NewPerson("Alice");
-        dynamic bob = NewPerson("Bob");
+        var alice = NewPerson("Alice");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         alice.Nickname = "Al";
         bob.Nickname = "Robert";
@@ -86,7 +81,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Runtime_method_can_read_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.ClassEval("public string Nickname { get; set; }");
 
@@ -105,7 +100,7 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Runtime_method_can_write_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.ClassEval("public string Nickname { get; set; }");
 
@@ -126,9 +121,10 @@ public sealed class ClassEvalTests : RuntimeTestBase
     [Fact]
     public void Computed_runtime_property_can_read_CLR_state()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
+        bob.ClassEval(
+            """
             public string UpperName
             {
                 get

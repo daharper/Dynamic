@@ -1,7 +1,4 @@
 ﻿using Dynamic.Career;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dynamic.Application.Registrar;
 

@@ -58,10 +58,12 @@ public class ActiveListTests
         dynamic person = new Person();
 
         string bob = person.Friends.Bob;
+
         person.Friends.Bob = "Bob";
 
         Assert.Single(person.Friends);
         Assert.Equal("Bob", person.Friends[0]);
+        Assert.Equal("Bob", bob);
     }
 
     [Fact]
@@ -70,6 +72,7 @@ public class ActiveListTests
         dynamic person = new Person();
 
         person.Friends.Bob = "Bob";
+
         string bob = person.Friends.Bob;
 
         Assert.Equal("Bob", bob);
@@ -107,13 +110,9 @@ public class ActiveListTests
     {
         var david = new Person();
 
-        Achievement mvp =
-            david.Achievements.Mvp("Embarcadero");
+        Achievement mvp = david.Achievements.Mvp("Embarcadero");
 
-        Assert.Equal(
-            new Achievement("Mvp", "Embarcadero"),
-            mvp);
-
+        Assert.Equal(new Achievement("Mvp", "Embarcadero"), mvp);
         Assert.Single(david.Achievements);
         Assert.Same(mvp, david.Achievements[0]);
     }
@@ -123,14 +122,10 @@ public class ActiveListTests
     {
         var david = new Person();
 
-        Achievement first =
-            david.Achievements.Mvp("Embarcadero");
-
-        Achievement second =
-            david.Achievements.Mvp("Embarcadero");
+        Achievement first = david.Achievements.Mvp("Embarcadero");
+        Achievement second = david.Achievements.Mvp("Embarcadero");
 
         Assert.Single(david.Achievements);
-
         Assert.Same(first, second);
         Assert.Same(first, david.Achievements[0]);
     }
@@ -142,10 +137,7 @@ public class ActiveListTests
 
         Achievement mvp = david.Achievements.Mvp;
 
-        Assert.Equal(
-            new Achievement("Mvp"),
-            mvp);
-
+        Assert.Equal(new Achievement("Mvp"), mvp);
         Assert.Single(david.Achievements);
         Assert.Same(mvp, david.Achievements[0]);
     }
@@ -155,30 +147,19 @@ public class ActiveListTests
     {
         var david = new Person();
 
-        Achievement detailed =
-            david.Achievements.Mvp("Embarcadero");
-
-        Achievement unspecified =
-            david.Achievements.Mvp;
+        Achievement detailed = david.Achievements.Mvp("Embarcadero");
+        Achievement unspecified = david.Achievements.Mvp;
 
         Assert.Equal(2, david.Achievements.Count);
-
-        Assert.Equal(
-            new Achievement("Mvp", "Embarcadero"),
-            detailed);
-
-        Assert.Equal(
-            new Achievement("Mvp"),
-            unspecified);
+        Assert.Equal(new Achievement("Mvp", "Embarcadero"), detailed);
+        Assert.Equal(new Achievement("Mvp"), unspecified);
     }
 
     [Fact]
     public void SetMember_AddsAchievement()
     {
         var david = new Person();
-
-        var mvp =
-            new Achievement("Mvp", "Embarcadero");
+        var mvp = new Achievement("Mvp", "Embarcadero");
 
         david.Achievements.Mvp = mvp;
 
@@ -190,12 +171,8 @@ public class ActiveListTests
     public void SetMember_Obj_IsIdempotent()
     {
         var david = new Person();
-
-        var first =
-            new Achievement("Mvp", "Embarcadero");
-
-        var equivalent =
-            new Achievement("Mvp", "Embarcadero");
+        var first = new Achievement("Mvp", "Embarcadero");
+        var equivalent = new Achievement("Mvp", "Embarcadero");
 
         david.Achievements.Mvp = first;
         david.Achievements.Mvp = equivalent;
@@ -210,14 +187,11 @@ public class ActiveListTests
     public void SetMember_DoesNotReplaceEquivalentExistingAchievement()
     {
         var david = new Person();
-
-        var existing =
-            new Achievement("Mvp", "Embarcadero");
+        var existing = new Achievement("Mvp", "Embarcadero");
 
         david.Achievements.Add(existing);
 
-        var replacement =
-            new Achievement("Mvp", "Embarcadero");
+        var replacement = new Achievement("Mvp", "Embarcadero");
 
         david.Achievements.Mvp = replacement;
 
@@ -230,11 +204,8 @@ public class ActiveListTests
     {
         var david = new Person();
 
-        var embarcadero =
-            new Achievement("Mvp", "Embarcadero");
-
-        var codeGear =
-            new Achievement("Mvp", "CodeGear");
+        var embarcadero = new Achievement("Mvp", "Embarcadero");
+        var codeGear = new Achievement("Mvp", "CodeGear");
 
         david.Achievements.Mvp = embarcadero;
         david.Achievements.Mvp = codeGear;

@@ -23,7 +23,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
     [Fact]
     public void Unknown_Member_Invocation_Creates_Auto_Property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         var result = bob.HairColor("green");
 
@@ -35,7 +35,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
     [Fact]
     public void Unknown_Member_Invocation_For_Known_Property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         var result = bob.FirstName("Bobby");
 
@@ -46,7 +46,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
     [Fact]
     public void Known_inherited_property_can_be_invoked_fluently()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         var result = bob.Description("Hello");
 
@@ -61,7 +61,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
 
         try
         {
-            dynamic bob = NewPerson("bob");
+            var bob = NewPerson("bob");
 
             var exception = Assert.Throws<InvalidOperationException>(() => bob.HairColor("green"));
 

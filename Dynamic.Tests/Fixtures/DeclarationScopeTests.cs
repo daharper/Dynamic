@@ -1,3 +1,9 @@
+
+
+
+
+
+
 namespace Dynamic.Tests.Fixtures;
 
 public sealed class DeclarationScopeTests : RuntimeTestBase
@@ -5,11 +11,9 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
     [Fact]
     public void Out_var_shadows_runtime_property_after_declaration()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public int Nickname { get; set; }
-            """);
+        bob.ClassEval("public int Nickname { get; set; }");
 
         bob.Nickname = 99;
 
@@ -21,19 +25,15 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            42,
-            (int)bob.OutVarShadow());
+        Assert.Equal(42, (int)bob.OutVarShadow());
     }
 
     [Fact]
     public void Foreach_variable_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
@@ -49,19 +49,15 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "A",
-            (string)bob.ForeachShadow());
+        Assert.Equal("A", (string)bob.ForeachShadow());
     }
 
     [Fact]
     public void Deconstruction_variable_shadows_runtime_property()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
@@ -73,15 +69,13 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "Local Nick",
-            (string)bob.DeconstructionShadow());
+        Assert.Equal("Local Nick", (string)bob.DeconstructionShadow());
     }
 
     [Fact]
     public void For_condition_pattern_variable_is_available_to_body()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.ClassEval("""
             public string ForPattern()
@@ -97,15 +91,13 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "For Nick",
-            (string)bob.ForPattern());
+        Assert.Equal("For Nick", (string)bob.ForPattern());
     }
 
     [Fact]
     public void While_condition_pattern_variable_is_available_to_body()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
         bob.ClassEval("""
             public string WhilePattern()
@@ -121,19 +113,15 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.Equal(
-            "While Nick",
-            (string)bob.WhilePattern());
+        Assert.Equal("While Nick", (string)bob.WhilePattern());
     }
 
     [Fact]
     public void Do_condition_pattern_variable_shadows_receiver_in_condition()
     {
-        dynamic bob = NewPerson("Bob");
+        var bob = NewPerson("Bob");
 
-        bob.ClassEval("""
-            public string Nickname { get; set; }
-            """);
+        bob.ClassEval("public string Nickname { get; set; }");
 
         bob.Nickname = "Robert";
 
@@ -156,7 +144,6 @@ public sealed class DeclarationScopeTests : RuntimeTestBase
             }
             """);
 
-        Assert.True(
-            (bool)bob.DoPattern());
+        Assert.True((bool)bob.DoPattern());
     }
 }

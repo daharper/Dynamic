@@ -4,7 +4,6 @@ using Dynamic.Tests.Mocks;
 
 namespace Dynamic.Tests.Fixtures;
 
-
 public class ExpressionTests
 {
     [Fact]
@@ -15,7 +14,6 @@ public class ExpressionTests
         Expression<Func<Person, bool>> expression = person => person.FirstName == name;
 
         var specification = SpecificationExtractor.Extract(expression);
-
         var criterion = Assert.IsType<Criterion>(specification);
 
         Assert.Equal(nameof(Person.FirstName), criterion.Member.Name);
@@ -31,7 +29,6 @@ public class ExpressionTests
         Expression<Func<Person, bool>> expression = person => person.Years >= years;
 
         var specification = SpecificationExtractor.Extract(expression);
-
         var criterion = Assert.IsType<Criterion>(specification);
 
         Assert.Equal(nameof(Person.Years), criterion.Member.Name);
@@ -46,8 +43,8 @@ public class ExpressionTests
         const int years = 5;
 
         Expression<Func<Person, bool>> expression = person => person.FirstName == name && person.Years >= years;
+        
         var specification = SpecificationExtractor.Extract(expression);
-
         var composite = Assert.IsType<CompositeSpecification>(specification);
 
         Assert.Equal(ExpressionType.AndAlso, composite.Operation);
