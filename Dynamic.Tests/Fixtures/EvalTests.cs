@@ -250,17 +250,9 @@ public sealed class EvalTests : RuntimeTestBase
         var keys = new[] { "A", "B", "C" };
         var values = new[] { 1, 2, 3 };
 
-        IEnumerable<(string, int)> result =
-            bob.GetPairs(keys, values);
+        IEnumerable<(string, int)> result = bob.GetPairs(keys, values);
 
-        Assert.Equal(
-            new[]
-            {
-                ("A", 1),
-                ("B", 2),
-                ("C", 3)
-            },
-            result);
+        Assert.Equal([("A", 1), ("B", 2), ("C", 3)], result);
     }
 
     [Fact]

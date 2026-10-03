@@ -190,6 +190,12 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
             return true;
         }
 
+        if (Props.TryGetValue(binder.Name, out var value))
+        {
+            result = value;
+            return true;
+        }
+
         if (Freeze is FreezeMode.Partial or FreezeMode.Fully)
         {
             result = null;

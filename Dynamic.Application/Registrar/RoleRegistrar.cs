@@ -13,7 +13,6 @@ public class RoleRegistrar : IResumeRegistrar
             .Title("Solution Architect")
             .StartYear("2005")
             .EndYear("2007")
-            .Description("C# development in an award-winning EdTech referenced by Microsoft and UNESCO")
-            .Rating(100);
+            .Description("C# development in an award-winning EdTech referenced by Microsoft and UNESCO");
     }
 }
