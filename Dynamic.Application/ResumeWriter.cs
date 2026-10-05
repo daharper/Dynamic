@@ -4,11 +4,23 @@ using Dynamic.Career;
 
 namespace Dynamic.Application;
 
+/// <summary>
+/// Provides functionality for generating and writing résumés sections for diagnostic purposes.
+/// This class uses a list of implementations of <see cref="IResumeScribe"/>
+/// to process and format specific sections of a résumé based on the specified
+/// <see cref="ResumeSection"/> flags.
+/// </summary>
 public static class ResumeWriter
 {
     private static readonly List<IResumeScribe> Scribes =
     [
-        new CompanyScribe()
+        new DetailScribe(),
+        new CompanyScribe(),
+        new PreferenceScribe(),
+        new HighlightScribe(),
+        new RoleScribe(),
+        new AchievementScribe(),
+        new SkillScribe()
     ];
     
     public static void Write(Resume r, ResumeSection sections)

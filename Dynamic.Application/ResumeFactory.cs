@@ -3,12 +3,17 @@ using Dynamic.Career;
 
 namespace Dynamic.Application;
 
+/// <summary>
+/// Factory class for creating instances of the <see cref="Resume"/> class.
+/// This class aggregates multiple registrars that populate different sections of a résumé
+/// and applies them during the creation process.
+/// </summary>
 public static class ResumeFactory
 {
     private static readonly List<IResumeRegistrar> Registrars =
     [
         new DetailsRegistrar(),
-        new WorkPreferencesRegistrar(),
+        new PreferencesRegistrar(),
         new CompanyRegistrar(),
         new HighlightsRegistrar(),
         new RoleRegistrar()

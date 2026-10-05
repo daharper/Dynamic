@@ -2,7 +2,7 @@
 
 namespace Dynamic.Application.Registrar;
 
-public class WorkPreferencesRegistrar : IResumeRegistrar
+public class PreferencesRegistrar : IResumeRegistrar
 {
     public void Register(Resume r)
     {

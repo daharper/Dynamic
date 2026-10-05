@@ -18,7 +18,6 @@ static void ByCode()
     var r = ResumeFactory.Create();
 
     ResumeWriter.Write(r, ResumeSection.All);
-    //r.Show();
 }
 
 static void ByScript()
@@ -29,5 +28,5 @@ static void ByScript()
 
     Eval.Run(text, () => r);
 
-    r.Show();
+    ResumeWriter.Write(r, ResumeSection.All);
 }
