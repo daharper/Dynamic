@@ -13,15 +13,25 @@ public enum CompanyScale
     Enterprise
 }
 
-public class Company : ActiveData<Skill>
+public enum Country
 {
-    public Company(string name, string description = "", CompanyScale scale = CompanyScale.NotSpecified) : base(name)
+    NotSpecified,
+    Australia,
+    Singapore,
+    UnitedKingdom
+}
+
+public class Company : ActiveObject<Company>
+{
+    public Company(string name, string description = "") 
+        : base(name)
     {
-        Scale = scale;
         Description = description;
     }
 
-    public CompanyScale Scale { get; set; }
+    public CompanyScale Scale { get; set; } = CompanyScale.NotSpecified;
+
+    public Country Country { get; set; } = Country.NotSpecified;
 }
 
 public sealed class CompanyComparer : IEqualityComparer<Company>

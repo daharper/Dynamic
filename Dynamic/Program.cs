@@ -2,6 +2,7 @@
 using Dynamic.Runtime;
 using System.Text;
 using Dynamic.Application;
+using Dynamic.Application.Scribe;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -16,7 +17,8 @@ static void ByCode()
 {
     var r = ResumeFactory.Create();
 
-    r.Show();
+    ResumeWriter.Write(r, ResumeSection.All);
+    //r.Show();
 }
 
 static void ByScript()
