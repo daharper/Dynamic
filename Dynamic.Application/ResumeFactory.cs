@@ -14,8 +14,11 @@ public static class ResumeFactory
     [
         new DetailsRegistrar(),
         new PreferencesRegistrar(),
+        new AchievementRegistrar(),
         new CompanyRegistrar(),
         new HighlightsRegistrar(),
+        new SkillRegistrar(),
+        new RecommendationRegistrar(),
         new RoleRegistrar()
     ];
 

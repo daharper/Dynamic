@@ -14,6 +14,7 @@ public class DetailScribe : IResumeScribe
                       Title: {r.Title}
                       Email: {r.Email}
                       LinkedIn: {r.LinkedIn}
+                      GitHub: {r.GitHub}
                       Location: {r.Location}
                       Availability: {r.Availability}
                       Minimum Salary: {r.MinimumSalary}

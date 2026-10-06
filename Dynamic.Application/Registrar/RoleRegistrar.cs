@@ -8,8 +8,8 @@ public class RoleRegistrar : IResumeRegistrar
     {
         r.Roles.HeuLabs
             .Title("Solution Architect")
-            .StartYear("2005")
-            .EndYear("2007")
+            .StartYear(2005)
+            .EndYear(2007)
             .Description("C# development in an award-winning EdTech referenced by Microsoft and UNESCO");
     }
 }

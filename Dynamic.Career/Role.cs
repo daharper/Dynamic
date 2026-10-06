@@ -2,18 +2,17 @@
 
 namespace Dynamic.Career;
 
-public class Role : ActiveObject<Role>
+public class Role(Company company) : ActiveObject<Role>
 {
-    public Role(Company company)
-    {
-        Company = company;
-    }
+    public Company Company { get; set; } = company;
 
-    public Company Company { get; set; }
+    public List<Recommendation> Recommendations { get; set; } = []; 
 
-    public string StartYear { get; set; }
+    public List<Skill> Skills { get; set; } = [];
+    
+    public int? StartYear { get; set; }
 
-    public string EndYear { get; set; }
+    public int? EndYear { get; set; } 
 }
 
 public sealed class RoleComparer : IEqualityComparer<Role>

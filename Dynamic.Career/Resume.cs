@@ -6,13 +6,24 @@ public sealed class Resume : ActiveObject<Resume>
 {
     public Resume()
     {
-        Highlights.Factory = (Func<string, Highlight>)(n => new Highlight(Companies.GetOrAdd(new Company(n))));
-        Roles.Factory = (Func<string, Role>)(n => new Role(Companies.GetOrAdd(new Company(n))));
+        Highlights.Factory = 
+            (Func<string, Highlight>)
+            (n => new Highlight(Companies.GetOrAdd(new Company(n))));
+        
+        Roles.Factory = 
+            (Func<string, Role>)
+            (n => new Role(Companies.GetOrAdd(new Company(n))));
+        
+        Recommendations.Factory = 
+            (Func<string, Recommendation>)
+            (n => new Recommendation(Companies.GetOrAdd(new Company(n))));
     }
 
     public string Email { get; set; } = "";
 
     public string LinkedIn { get; set; } = "";
+    
+    public string GitHub { get; set; } = "";
 
     public string Location { get; set; } = "";
     
@@ -34,6 +45,8 @@ public sealed class Resume : ActiveObject<Resume>
 
     public dynamic Skills { get; } = new ActiveList<Skill>(n => new Skill(n), new SkillComparer());
 
+    public dynamic Recommendations { get; } = new ActiveList<Recommendation>(null, new RecommendationComparer());
+    
     public void AddSkill(Skill skill, params Skill[] childSkills)
     {
         skill = Skills.GetOrAdd(skill);

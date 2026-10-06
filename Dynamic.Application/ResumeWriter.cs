@@ -15,12 +15,13 @@ public static class ResumeWriter
     private static readonly List<IResumeScribe> Scribes =
     [
         new DetailScribe(),
-        new CompanyScribe(),
         new PreferenceScribe(),
-        new HighlightScribe(),
-        new RoleScribe(),
         new AchievementScribe(),
-        new SkillScribe()
+        new CompanyScribe(),
+        new HighlightScribe(),
+        new SkillScribe(),
+        new RecommendationScribe(),
+        new RoleScribe(),
     ];
     
     public static void Write(Resume r, ResumeSection sections)

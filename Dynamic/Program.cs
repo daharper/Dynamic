@@ -17,7 +17,7 @@ static void ByCode()
 {
     var r = ResumeFactory.Create();
 
-    ResumeWriter.Write(r, ResumeSection.All);
+    ResumeWriter.Write(r, ResumeSection.Skill); //ResumeSection.All);
 }
 
 static void ByScript()

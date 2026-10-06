@@ -10,5 +10,6 @@ public enum ResumeSection
     Role = 16,
     Achievement = 32,
     Skill = 64,
+    Recommendation = 128,
     All = 255,
 }
