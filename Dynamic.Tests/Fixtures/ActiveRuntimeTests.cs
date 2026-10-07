@@ -30,8 +30,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
         Assert.Equal("green", bob.MetaProperties["HairColor"]);
         Assert.Same(bob, result);
     }
-
-
+    
     [Fact]
     public void Unknown_Member_Invocation_For_Known_Property()
     {
