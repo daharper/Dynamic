@@ -27,7 +27,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
 
         var result = bob.HairColor("green");
 
-        Assert.Equal("green", bob.Props["HairColor"]);
+        Assert.Equal("green", bob.MetaProperties["HairColor"]);
         Assert.Same(bob, result);
     }
 
@@ -66,7 +66,7 @@ public class ActiveRuntimeTests : RuntimeTestBase
             var exception = Assert.Throws<InvalidOperationException>(() => bob.HairColor("green"));
 
             Assert.Contains("HairColor", exception.Message);
-            Assert.False(bob.Props.ContainsKey("HairColor"));
+            Assert.False(bob.HasMetaProperty("HairColor"));
         }
         finally
         {

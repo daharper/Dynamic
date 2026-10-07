@@ -75,6 +75,12 @@ public class ActiveMetadata : ActiveNode
     public bool HasMetaAlias(string name) 
         => MetaAliases.Any(alias => StringComparer.OrdinalIgnoreCase.Equals(alias, name));
     
+    /// <summary>
+    /// Indicates whether the specified meta property exists.
+    /// </summary>
+    public bool HasMetaProperty(string name)
+        => MetaProperties.ContainsKey(name);
+    
     public dynamic Aka(params string[] aliases)
         => MetaAlias(aliases);
     
