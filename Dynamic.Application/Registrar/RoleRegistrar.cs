@@ -4,6 +4,8 @@ namespace Dynamic.Application.Registrar;
 
 public class RoleRegistrar : IResumeRegistrar
 {
+    public ResumeSection Section => ResumeSection.Role;
+    
     public void Register(Resume r)
     {
         r.Roles.HeuLabs

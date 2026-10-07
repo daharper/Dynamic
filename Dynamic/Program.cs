@@ -2,7 +2,6 @@
 using Dynamic.Runtime;
 using System.Text;
 using Dynamic.Application;
-using Dynamic.Application.Scribe;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -15,9 +14,19 @@ return;
 
 static void ByCode()
 {
-    var r = ResumeFactory.Create();
+    const ResumeSection sections =
+        ResumeSection.Detail |
+        ResumeSection.Preference | 
+        ResumeSection.Achievement |
+        ResumeSection.Company |
+        ResumeSection.Highlight |
+        ResumeSection.Recommendation |
+        ResumeSection.Skill | 
+        ResumeSection.Role;
+    
+    var r = ResumeFactory.Create(sections);
 
-    ResumeWriter.Write(r, ResumeSection.Skill); //ResumeSection.All);
+    ResumeWriter.Write(r, sections);
 }
 
 static void ByScript()

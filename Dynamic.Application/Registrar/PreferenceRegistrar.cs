@@ -2,8 +2,10 @@
 
 namespace Dynamic.Application.Registrar;
 
-public class PreferencesRegistrar : IResumeRegistrar
+public class PreferenceRegistrar : IResumeRegistrar
 {
+    public ResumeSection Section => ResumeSection.Preference;
+    
     public void Register(Resume r)
     {
         r.Eligible.Australia.Options = Option.Remote | Option.AnyOnRelocation;

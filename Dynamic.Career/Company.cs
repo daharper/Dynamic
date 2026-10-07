@@ -21,14 +21,12 @@ public enum Country
     UnitedKingdom
 }
 
-public class Company : ActiveObject<Company>
+public class Company(string name, string description = "") : ActiveObject<Company>
 {
-    public Company(string name, string description = "") 
-        : base(name)
-    {
-        Description = description;
-    }
+    public string Name { get; set; } = name;
 
+    public string Description { get; set; } = description;
+    
     public CompanyScale Scale { get; set; } = CompanyScale.NotSpecified;
 
     public Country Country { get; set; } = Country.NotSpecified;

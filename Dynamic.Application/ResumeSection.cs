@@ -1,4 +1,4 @@
-﻿namespace Dynamic.Application.Scribe;
+﻿namespace Dynamic.Application;
 
 [Flags]
 public enum ResumeSection

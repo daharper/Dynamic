@@ -14,7 +14,7 @@ public enum Option
     AnyOnRelocation = 32
 }
 
-public class Preference(string country, Option options = Option.Remote) : ActiveObject<Preference>(country)
+public class Preference(string country, Option options = Option.Remote) : ActiveObject<Preference>
 {
     public string Country { get; set; } = country;
 

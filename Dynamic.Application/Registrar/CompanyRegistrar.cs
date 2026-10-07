@@ -4,6 +4,8 @@ namespace Dynamic.Application.Registrar;
 
 public class CompanyRegistrar : IResumeRegistrar
 {
+    public ResumeSection Section => ResumeSection.Company;
+    
     public void Register(Resume r)
     {
         r.Companies.IndependentRnD("Self-funded research and development")

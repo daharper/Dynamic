@@ -17,11 +17,11 @@ public class CompanyScribe : IResumeScribe
             sb.AppendLine(c.Description);
             sb.AppendLine();
 
-            if (c.HasNote)
+            if (c.AnyMetaNote)
             {
                 sb.AppendLine("[notes]");
 
-                foreach (var note in c.Notes)
+                foreach (var note in c.MetaNotes)
                 {
                     sb.AppendLine(note);
                 }

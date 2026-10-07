@@ -4,11 +4,13 @@ namespace Dynamic.Application.Registrar;
 
 public class RecommendationRegistrar :  IResumeRegistrar
 {
+    public ResumeSection Section => ResumeSection.Recommendation;
+    
     public void Register(Resume r)
     {
         r.Recommendations.WebSpy
             .Name("Michael Thompson")
-            .TItle("General Manager")
+            .Title("General Manager")
             .LinkedIn("https://www.linkedin.com/in/michael-thompson-69759a7/")
             .Description(
                 "David subcontracted for us around 1999 to 2000, and despite the time that’s passed, " +

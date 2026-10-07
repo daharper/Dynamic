@@ -2,7 +2,10 @@
 
 namespace Dynamic.Career;
 
-public sealed class Skill(string name, Skill? parent = null) : ActiveObject<Skill>(name, parent);
+public sealed class Skill(string name) : ActiveObject<Skill>
+{
+    public string Name { get; set; } = name;
+}
 
 public sealed class SkillComparer : IEqualityComparer<Skill>
 {

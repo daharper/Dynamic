@@ -12,23 +12,26 @@ public static class ResumeFactory
 {
     private static readonly List<IResumeRegistrar> Registrars =
     [
-        new DetailsRegistrar(),
-        new PreferencesRegistrar(),
+        new DetailRegistrar(),
+        new PreferenceRegistrar(),
         new AchievementRegistrar(),
         new CompanyRegistrar(),
-        new HighlightsRegistrar(),
+        new HighlightRegistrar(),
         new SkillRegistrar(),
         new RecommendationRegistrar(),
         new RoleRegistrar()
     ];
 
-    public static Resume Create()
+    public static Resume Create(ResumeSection sections)
     {
         var r = new Resume();
         
         foreach (var registrar in Registrars)
         {
-            registrar.Register(r);
+            if ((sections & registrar.Section) == registrar.Section)
+            {
+                registrar.Register(r);
+            }
         }
 
         return r;

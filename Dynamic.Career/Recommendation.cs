@@ -2,16 +2,16 @@
 
 namespace Dynamic.Career;
 
-public class Recommendation : ActiveObject<Recommendation>
+public class Recommendation(Company company, string name = "", string title = "") : ActiveObject<Recommendation>
 {
-    public Recommendation(Company company, string name = "", string title = "") : base(name)
-    {
-        Company = company;
-        Title = title;
-    }
+    public Company Company { get; set; } = company;
     
-    public Company Company { get; set; }
+    public string Name { get; set; } = name;
     
+    public string Description { get; set; } = "";
+
+    public string Title { get; set; } = title;
+
     public string LinkedIn { get; set; } = "";
 }
 

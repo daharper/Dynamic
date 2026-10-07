@@ -5,7 +5,7 @@ namespace Dynamic.Application.Scribe;
 
 public class RecommendationScribe : IResumeScribe
 {
-    public ResumeSection Section => ResumeSection.Company;
+    public ResumeSection Section => ResumeSection.Recommendation;
 
     public void Write(Resume r, StringBuilder sb)
     {
@@ -14,13 +14,16 @@ public class RecommendationScribe : IResumeScribe
         foreach (var rec in r.Recommendations)
         {
             sb.AppendLine($"{rec.Name} - {rec.Title} ({rec.Company.Name})");
+            sb.AppendLine($"{rec.LinkedIn}");
+            sb.AppendLine();
+            
             sb.AppendLine(rec.Description);
             
-            if (rec.HasNote)
+            if (rec.AnyMetaNote)
             {
                 sb.AppendLine("[notes]");
 
-                foreach (var note in rec.Notes)
+                foreach (var note in rec.MetaNotes)
                 {
                     sb.AppendLine(note);
                 }

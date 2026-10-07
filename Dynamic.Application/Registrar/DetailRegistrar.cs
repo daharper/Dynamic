@@ -2,8 +2,10 @@
 
 namespace Dynamic.Application.Registrar;
 
-public class DetailsRegistrar : IResumeRegistrar
+public class DetailRegistrar : IResumeRegistrar
 {
+    public ResumeSection Section => ResumeSection.Detail;
+    
     public void Register(Resume r)
     {
         r.Name = "David Harper";

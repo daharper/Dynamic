@@ -14,10 +14,12 @@ public class SkillScribe : IResumeScribe
         foreach (var s in r.Skills)
         {
             WriteNameAndAliases(s, sb);
-            WriteParent(s, sb);
-            WriteChildren(s, sb);
-            WriteMembers(s, sb);
-            WriteMemberships(s, sb);
+            // WriteParent(s, sb);
+            // WriteChildren(s, sb);
+            
+            WriteListed(s, sb);
+            WriteListings(s, sb);
+
             WriteNotes(s, sb);
             WriteProperties(s, sb);
         }
@@ -25,62 +27,62 @@ public class SkillScribe : IResumeScribe
 
     private static void WriteNameAndAliases(Skill s, StringBuilder sb)
     {
-        var aliases = s.HasAlias ? "(" + string.Join(" ", s.Aliases) + ")" : "";
+        var aliases = s.AnyMetaAlias ? "(" + string.Join(" ", s.MetaAliases) + ")" : "";
 
         sb.AppendLine($"  • {s.Name} {aliases}");
     }
     
-    private static void WriteParent(Skill s, StringBuilder sb)
-    {
-        if (!s.HasParent) return;
-        
-        sb.AppendLine("        [parent]");
-        sb.AppendLine($"        • {s.Parent!.Name}");
-    }
+    // private static void WriteParent(Skill s, StringBuilder sb)
+    // {
+    //     if (!s.HasParent) return;
+    //     
+    //     sb.AppendLine("        [parent]");
+    //     sb.AppendLine($"        • {s.Parent!.Name}");
+    // }
+    //
+    // private static void WriteChildren(Skill s, StringBuilder sb)
+    // {
+    //     if (!s.HasChild) return;
+    //     
+    //     sb.AppendLine("        [children]");
+    //
+    //     foreach (var child in s.Children)
+    //     {
+    //         sb.AppendLine($"        • {child.Name}");
+    //     }
+    // }
     
-    private static void WriteChildren(Skill s, StringBuilder sb)
+    private static void WriteListed(Skill s, StringBuilder sb)
     {
-        if (!s.HasChild) return;
+        if (!s.IsList) return;
         
-        sb.AppendLine("        [children]");
+        sb.AppendLine("        [lists]");
 
-        foreach (var child in s.Children)
+        foreach (var listed in s.AllListed)
         {
-            sb.AppendLine($"        • {child.Name}");
+            sb.AppendLine($"        • {listed.Name}");
         }
     }
     
-    private static void WriteMembers(Skill s, StringBuilder sb)
+    private static void WriteListings(Skill s, StringBuilder sb)
     {
-        if (!s.HasMember) return;
+        if (!s.IsListed) return;
         
-        sb.AppendLine("        [members]");
+        sb.AppendLine("        [listed in]");
 
-        foreach (var member in s.AllMembers)
+        foreach (var list in s.AllLists)
         {
-            sb.AppendLine($"        • {member.Name}");
-        }
-    }
-    
-    private static void WriteMemberships(Skill s, StringBuilder sb)
-    {
-        if (!s.IsMember) return;
-        
-        sb.AppendLine("        [member of]");
-
-        foreach (var memberOf in s.MemberOf)
-        {
-            sb.AppendLine($"        • {memberOf.Name}");
+            sb.AppendLine($"        • {list.Name}");
         }
     }
     
     private static void WriteProperties(Skill s, StringBuilder sb)
     {
-        if (!s.HasProp) return;
+        if (!s.AnyMetaProperty) return;
         
         sb.AppendLine("        [properties]");
 
-        foreach (var prop in s.Props)
+        foreach (var prop in s.MetaProperties)
         {
             sb.AppendLine($"        • {prop.Key} = {s.AsStr(prop.Key)}");
         }
@@ -88,11 +90,11 @@ public class SkillScribe : IResumeScribe
 
     private static void WriteNotes(Skill s, StringBuilder sb)
     {
-        if (!s.HasNote) return;
+        if (!s.AnyMetaNote) return;
         
         sb.AppendLine("        [notes]");
 
-        foreach (var note in s.Notes)
+        foreach (var note in s.MetaNotes)
         {
             sb.AppendLine($"        • {note}");
         }

@@ -15,9 +15,9 @@ public class HighlightScribe : IResumeScribe
         {
             sb.AppendLine($"  • {h.Company.Name}: {h.Description}");
 
-            if (!h.HasLink) continue;
+            if (!h.AnyMetaLink) continue;
             
-            foreach (var link in h.Links)
+            foreach (var link in h.MetaLinks)
             {
                 sb.AppendLine($"    - {link.Title} ({link.Url})");
             }

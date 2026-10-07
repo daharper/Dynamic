@@ -13,7 +13,7 @@ public class AchievementScribe : IResumeScribe
 
         foreach (var a in r.Achievements)
         {
-            sb.AppendLine($"  • {a.Name} ({a.Organisation})");
+            sb.AppendLine($"  • {a.Title ?? a.Name} ({a.Organisation})");
         }
     }
 }

@@ -5,10 +5,10 @@ namespace Dynamic.Career;
 public class Role(Company company) : ActiveObject<Role>
 {
     public Company Company { get; set; } = company;
+    
+    public List<Task> Tasks { get; set; } = [];
 
     public List<Recommendation> Recommendations { get; set; } = []; 
-
-    public List<Skill> Skills { get; set; } = [];
     
     public int? StartYear { get; set; }
 

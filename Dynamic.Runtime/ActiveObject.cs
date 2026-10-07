@@ -10,7 +10,7 @@ namespace Dynamic.Runtime;
 /// resolved and invoked dynamically at runtime.
 /// </summary>
 /// <typeparam name="TSelf"> The concrete active object type.</typeparam>
-public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : ActiveObject<TSelf>
+public abstract class ActiveObject<TSelf> : ActiveMetadata where TSelf : ActiveObject<TSelf>
 {
     private ActiveObjectClass<TSelf> _objectClass = ActiveObjectClass<TSelf>.Empty;
 
@@ -39,11 +39,7 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
     private readonly Lock _slotGate = new();
 
     private readonly Dictionary<string, object?> _slots = new(StringComparer.Ordinal);
-
-    public ActiveObject(string name = "", TSelf? parent = null) : base(name, parent)
-    {
-    }
-
+    
     protected TSelf Self => (TSelf)this;
 
     protected ActiveClass<TSelf> Class => ActiveClassRegistry<TSelf>.Current;
@@ -190,7 +186,7 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
             return true;
         }
 
-        if (Props.TryGetValue(binder.Name, out var value))
+        if (MetaProperties.TryGetValue(binder.Name, out var value))
         {
             result = value;
             return true;
@@ -339,7 +335,7 @@ public abstract class ActiveObject<TSelf> : ActiveData<TSelf> where TSelf : Acti
         if (!ActiveRuntime.AutoProperties) 
             throw new InvalidOperationException($"Auto-properties are disabled: {message.Name}");
 
-        Props[message.Name] = message.Arguments[0]!;
+        MetaProperties[message.Name] = message.Arguments[0]!;
 
         result = Self;
         return true;

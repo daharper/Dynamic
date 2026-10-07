@@ -2,13 +2,11 @@
 
 namespace Dynamic.Career;
 
-public class Highlight : ActiveObject<Highlight>
+public class Highlight(Company company, string description = "") : ActiveObject<Highlight>
 {
-    public Highlight(Company company, string description = "") : base(company.Name)
-    {
-        Company = company;
-        Description = description;
-    }
+    public string Name => Company.Name;
+    
+    public string Description { get; set; } = description;
 
-    public Company Company { get; set; }
+    public Company Company { get; set; } = company;
 }
