@@ -14,8 +14,6 @@ public class SkillScribe : IResumeScribe
         foreach (var s in r.Skills)
         {
             WriteNameAndAliases(s, sb);
-            // WriteParent(s, sb);
-            // WriteChildren(s, sb);
             
             WriteListed(s, sb);
             WriteListings(s, sb);
@@ -29,28 +27,8 @@ public class SkillScribe : IResumeScribe
     {
         var aliases = s.AnyMetaAlias ? "(" + string.Join(" ", s.MetaAliases) + ")" : "";
 
-        sb.AppendLine($"  • {s.Name} {aliases}");
+        sb.AppendLine($"  • {s.Title} {aliases}");
     }
-    
-    // private static void WriteParent(Skill s, StringBuilder sb)
-    // {
-    //     if (!s.HasParent) return;
-    //     
-    //     sb.AppendLine("        [parent]");
-    //     sb.AppendLine($"        • {s.Parent!.Name}");
-    // }
-    //
-    // private static void WriteChildren(Skill s, StringBuilder sb)
-    // {
-    //     if (!s.HasChild) return;
-    //     
-    //     sb.AppendLine("        [children]");
-    //
-    //     foreach (var child in s.Children)
-    //     {
-    //         sb.AppendLine($"        • {child.Name}");
-    //     }
-    // }
     
     private static void WriteListed(Skill s, StringBuilder sb)
     {

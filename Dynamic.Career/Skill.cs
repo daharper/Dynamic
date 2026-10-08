@@ -5,6 +5,12 @@ namespace Dynamic.Career;
 public sealed class Skill(string name) : ActiveObject<Skill>
 {
     public string Name { get; set; } = name;
+
+    public string Title
+    {
+        get => string.IsNullOrWhiteSpace(field) ? Name : field;
+        set;
+    }
 }
 
 public sealed class SkillComparer : IEqualityComparer<Skill>

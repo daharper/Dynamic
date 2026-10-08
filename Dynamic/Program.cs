@@ -15,14 +15,14 @@ return;
 static void ByCode()
 {
     const ResumeSection sections =
-        ResumeSection.Detail |
-        ResumeSection.Preference | 
-        ResumeSection.Achievement |
-        ResumeSection.Company |
-        ResumeSection.Highlight |
-        ResumeSection.Recommendation |
-        ResumeSection.Skill | 
-        ResumeSection.Role;
+        // ResumeSection.Detail |
+        // ResumeSection.Preference | 
+        // ResumeSection.Achievement |
+        // ResumeSection.Company |
+        // ResumeSection.Highlight |
+        // ResumeSection.Recommendation |
+        ResumeSection.Skill;// | 
+        // ResumeSection.Role;
     
     var r = ResumeFactory.Create(sections);
 
