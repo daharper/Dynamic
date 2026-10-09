@@ -8,25 +8,25 @@ Console.OutputEncoding = Encoding.UTF8;
 ActiveRuntime.Register(typeof(Resume));
 
 ByCode();
-//ByScript();
+//ByScript(); - resume.txt needs updating to new semantics
 
 return;
 
 static void ByCode()
 {
     const ResumeSection sections =
-        // ResumeSection.Detail |
-        // ResumeSection.Preference | 
-        // ResumeSection.Achievement |
-        // ResumeSection.Company |
-        // ResumeSection.Highlight |
-        // ResumeSection.Recommendation |
-        ResumeSection.Skill;// | 
-        // ResumeSection.Role;
+        ResumeSection.Detail |
+        ResumeSection.Preference | 
+        ResumeSection.Achievement |
+        ResumeSection.Company |
+        ResumeSection.Highlight |
+        ResumeSection.Recommendation |
+        ResumeSection.Skill | 
+        ResumeSection.Role;
     
     var r = ResumeFactory.Create(sections);
 
-    ResumeWriter.Write(r, sections);
+    ResumeWriter.Write(r, ResumeSection.Role);
 }
 
 static void ByScript()

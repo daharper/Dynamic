@@ -17,10 +17,6 @@ public sealed class Resume : ActiveObject<Resume>
         Recommendations.Factory = 
             (Func<string, Recommendation>)
             (n => new Recommendation(Companies.GetOrAdd(new Company(n))));
-        
-        Skills.Factory = 
-            (Func<string, Skill>)
-            (n => new Skill(n));
     }
 
     public string Name { get; set; } = "";

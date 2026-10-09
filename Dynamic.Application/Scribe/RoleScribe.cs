@@ -3,7 +3,7 @@ using Dynamic.Career;
 
 namespace Dynamic.Application.Scribe;
 
-public class RoleScribe : IResumeScribe
+public class RoleScribe : ResumeScribe, IResumeScribe
 {
     public ResumeSection Section => ResumeSection.Role;
 
@@ -15,6 +15,10 @@ public class RoleScribe : IResumeScribe
         {
             sb.AppendLine($"  • {role.StartYear} - {role.EndYear} {role.Company.Name} {role.Title}");
             sb.AppendLine($"    {role.Description}");
+            
+            WriteListed(role, sb);
+            WriteProperties(role, sb);
+            WriteNotes(role, sb);
         }
     }
 }
