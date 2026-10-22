@@ -7,8 +7,8 @@ Console.OutputEncoding = Encoding.UTF8;
 
 ActiveRuntime.Register(typeof(Resume));
 
-ByCode();
-//ByScript(); - resume.txt needs updating to new semantics
+//ByCode();
+ByScript(); //- resume.txt needs updating to new semantics
 
 return;
 
