@@ -10,6 +10,7 @@ public class SkillScribe : ResumeScribe, IResumeScribe
     public void Write(Resume r, StringBuilder sb)
     {
         sb.AppendLine("Skills:");
+        sb.AppendLine();
 
         foreach (var s in r.Skills)
         {
@@ -20,6 +21,8 @@ public class SkillScribe : ResumeScribe, IResumeScribe
 
             WriteNotes(s, sb);
             WriteProperties(s, sb);
+
+            sb.AppendLine();
         }
     }
 

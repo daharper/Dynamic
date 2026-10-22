@@ -52,7 +52,8 @@ public class SkillRegistrar : IResumeRegistrar
         Skill.ObjectPascal
             .ListedIn(Language)
             .Aka("OP")
-            .Title("Object Pascal");
+            .Title("Object Pascal")
+            .Versions(new[] { "3", "4", "5", "6", "7", "XE2", "10", "11", "12", "13" });
 
         Skill.VCL
             .Title("Visual Component Library")
